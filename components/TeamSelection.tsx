@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   createStyles,
   Table,
@@ -17,11 +17,25 @@ import {
   Stack,
   Box,
 } from '@mantine/core';
-import { arraysHaveSameItems, getTeamIcon, getTeamRecord } from 'lib/utils';
+import {
+  arraysHaveSameItems,
+  currencyFormatter,
+  getFraudValueColor,
+  getTeamIcon,
+  getTeamRecord,
+} from 'lib/utils';
 import { useUser } from '@supabase/auth-helpers-react';
 import { supabaseClient } from '@supabase/auth-helpers-nextjs';
 import Link from 'next/link';
-import { ArrowBackUp, ArrowUp, ListCheck } from 'tabler-icons-react';
+import {
+  AlertCircle,
+  ArrowBackUp,
+  ArrowUp,
+  Check,
+  InfoCircle,
+  ListCheck,
+} from 'tabler-icons-react';
+import { showNotification } from '@mantine/notifications';
 
 const useStyles = createStyles((theme) => ({
   rowSelected: {
@@ -43,49 +57,108 @@ interface TeamSelectionProps {
   }[];
 }
 
-export function TeamSelection({ teams, activeFraudPicks }: TeamSelectionProps) {
+export function TeamSelection({
+  teams,
+  activeFraudPicks,
+  matchups,
+}: TeamSelectionProps) {
+  const [loading, setLoading] = useState(false);
   const { user } = useUser();
   const { classes, cx } = useStyles();
-  const [selection, setSelection] = useState<string[]>([
-    ...activeFraudPicks.picks,
-  ]);
+  const [selection, setSelection] = useState<string[]>([]);
+  const [basePicks, setBasePicks] = useState<string[]>([]);
 
-  var formatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  });
+  useEffect(() => {
+    if (activeFraudPicks.picks?.length > 0) {
+      setSelection(activeFraudPicks.picks);
+      setBasePicks(activeFraudPicks.picks);
+    }
+  }, [activeFraudPicks]);
 
   const teamLookup = teams.reduce((acc, curr) => {
     return { [curr.id]: { ...curr }, ...acc };
   }, {});
 
+  const now = new Date();
+  const weekIsLocked = now >= matchups.startDate;
+
   const submitFraudPicks = async () => {
-    if (selection.length !== 3) {
-      console.log('ya gotta make 3 picks my guy');
-    } else {
-      if (activeFraudPicks) {
-        // update mode
-        if (arraysHaveSameItems(selection, activeFraudPicks.picks)) {
-          console.log('picks are same, not updating');
-        } else {
-          console.log('updating picks');
-          const { data, error } = await supabaseClient
-            .from('fraud-picks')
-            .update({ picks: selection, updated_at: 'now()' })
-            .match({ user_id: user?.id, week: 7, season: 2021 });
-          console.log('done updating', data, error);
-        }
+    // Make sure week is not locked
+    if (weekIsLocked) {
+      showNotification({
+        title: 'Picks locked!',
+        message: 'Close those dev tools, the week is locked!',
+        color: 'blue',
+        icon: <InfoCircle />,
+      });
+    }
+    // Start loading
+    setLoading(true);
+    if (activeFraudPicks.picks?.length > 0) {
+      // update mode
+      if (arraysHaveSameItems(selection, basePicks)) {
+        showNotification({
+          title: 'Picks are the same',
+          message: 'What do you think these servers grow on trees?',
+          color: 'blue',
+          icon: <InfoCircle />,
+        });
       } else {
-        // create mode
-        console.log('making picks');
-        const { data, error } = await supabaseClient
-          .from('fraud-picks')
-          .insert([
-            { user_id: user?.id, week: 7, season: 2021, picks: selection },
-          ]);
-        console.log('done creating', data, error);
+        const { error } = await supabaseClient
+          .from('fraudPicks')
+          .update({ picks: selection, updatedAt: 'now()' })
+          .match({ userId: user?.id, week: matchups.week, season: 2022 });
+
+        if (!error) {
+          setBasePicks([...selection]);
+
+          showNotification({
+            title: 'Picks updated!',
+            message: `You now have ${totalWager()} on the line`,
+            color: 'teal',
+            icon: <Check />,
+          });
+        } else {
+          showNotification({
+            title: 'Update failed',
+            message: error.message,
+            color: 'red',
+            icon: <AlertCircle />,
+          });
+        }
+      }
+    } else {
+      // create mode
+      const { error } = await supabaseClient
+        .from('fraudPicks')
+        .insert([
+          {
+            userId: user?.id,
+            week: matchups.week,
+            season: 2022,
+            picks: selection,
+          },
+        ]);
+
+      if (!error) {
+        setBasePicks([...selection]);
+
+        showNotification({
+          title: 'Picks made!',
+          message: `You put ${totalWager()} on the line`,
+          color: 'teal',
+          icon: <Check />,
+        });
+      } else {
+        showNotification({
+          title: 'Woopsie!',
+          message: error.message,
+          color: 'red',
+          icon: <AlertCircle />,
+        });
       }
     }
+    setLoading(false);
   };
 
   const toggleRow = (id: string) => {
@@ -98,15 +171,9 @@ export function TeamSelection({ teams, activeFraudPicks }: TeamSelectionProps) {
     }
   };
 
-  const getFraudValueColor = (fraudValue: number): string => {
-    if (fraudValue > 95) return 'teal';
-    if (fraudValue > 40) return 'lime';
-    if (fraudValue < 0) return 'red';
-    return 'yellow';
-  };
-
   const getSelectionBox = (teamSlug: string) => {
     const team = teamLookup[teamSlug];
+
     return (
       <Grid.Col xs={3} key={teamSlug}>
         <Card
@@ -129,7 +196,7 @@ export function TeamSelection({ teams, activeFraudPicks }: TeamSelectionProps) {
               {team.name}
             </Text>
             <Text color="dimmed" align="center" size="sm">
-              {formatter.format(team.fraudValue)}
+              {currencyFormatter.format(team.fraudValue)}
             </Text>
           </Card.Section>
         </Card>
@@ -137,21 +204,30 @@ export function TeamSelection({ teams, activeFraudPicks }: TeamSelectionProps) {
     );
   };
 
-  const totalWager = (): number => {
+  const totalWager = (): string => {
     const wager = selection.reduce(
       (acc, curr) => acc + teamLookup[curr].fraudValue,
       0,
     );
 
-    return formatter.format(wager);
+    return currencyFormatter.format(wager);
   };
 
-  const rows = teams.map((team, i) => {
+  const rows = teams.map((team) => {
     const selected = selection.includes(team.id);
     const { id, name, wins, losses, ties, fraudValue } = team;
+    // Find the team's matchup this week
+    const matchupObj = matchups.matchups.find(
+      (m) => m.home === team.id || m.away === team.id,
+    );
+    // If no matchup, on bye
+    if (!matchupObj) {
+      return null;
+    }
 
-    const opponentIdx = Math.floor(Math.random() * 32);
-    const opponent = teams[opponentIdx];
+    const opponentIsHome = matchupObj.away === team.id;
+    const opponent =
+      teamLookup[opponentIsHome ? matchupObj.home : matchupObj.away];
 
     return (
       <Box
@@ -159,24 +235,27 @@ export function TeamSelection({ teams, activeFraudPicks }: TeamSelectionProps) {
         key={id}
         className={cx({ [classes.rowSelected]: selected })}
         onClick={() => {
-          toggleRow(id);
+          if (!weekIsLocked) {
+            toggleRow(id);
+          }
         }}
-        sx={(theme) => ({
+        sx={{
           cursor: 'pointer',
-        })}
+        }}
       >
         <td>
           <Checkbox
             checked={selection.includes(id)}
             onChange={() => toggleRow(id)}
             transitionDuration={0}
+            disabled={weekIsLocked}
           />
         </td>
         <td>
           <Group spacing="sm">
             <Avatar size={36} src={getTeamIcon(id)} radius="xl" />
             <Text size="md" weight={700}>
-              {i + 1}. {name}
+              {name}
             </Text>
           </Group>
         </td>
@@ -184,16 +263,24 @@ export function TeamSelection({ teams, activeFraudPicks }: TeamSelectionProps) {
           <Text size="md">{getTeamRecord({ wins, losses, ties })}</Text>
         </td>
         <td>
-          <Group spacing="sm">
-            <Avatar size={24} src={getTeamIcon(opponent.id)} radius="xl" />
+          <Group spacing={0}>
+            <Text color="dimmed" weight={700}>
+              {opponentIsHome ? '@' : 'vs.'}
+            </Text>
+            <Avatar
+              size={24}
+              mx="xs"
+              src={getTeamIcon(opponent.id)}
+              radius="xl"
+            />
             <Text weight={700} color={getFraudValueColor(opponent.fraudValue)}>
-              {formatter.format(opponent.fraudValue)}
+              {currencyFormatter.format(opponent.fraudValue)}
             </Text>
           </Group>
         </td>
         <td>
           <Text size="xl" weight={700} color={getFraudValueColor(fraudValue)}>
-            {formatter.format(fraudValue)}
+            {currencyFormatter.format(fraudValue)}
           </Text>
         </td>
       </Box>
@@ -212,9 +299,10 @@ export function TeamSelection({ teams, activeFraudPicks }: TeamSelectionProps) {
             <Button
               fullWidth
               onClick={submitFraudPicks}
-              disabled={totalWager() <= 0 || selection.length < 3}
+              loading={loading}
+              disabled={selection.length < 3 || weekIsLocked}
             >
-              Submit
+              {weekIsLocked ? 'Locked In' : 'Submit'}
             </Button>
           </Card>
         </Grid.Col>
@@ -226,7 +314,7 @@ export function TeamSelection({ teams, activeFraudPicks }: TeamSelectionProps) {
             <th></th>
             <th>Team</th>
             <th>Record</th>
-            <th>vs.</th>
+            <th>Opponent</th>
             <th>Value</th>
           </tr>
         </thead>

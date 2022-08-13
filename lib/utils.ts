@@ -1,4 +1,6 @@
 import { User } from '@supabase/supabase-js';
+import { Schedule } from 'types/football';
+import { Profile } from 'types/user';
 import { supabase } from './initSupabase';
 
 export function isLoggedIn(user: User | null) {
@@ -93,7 +95,7 @@ export function getTeamRecord({ wins, losses, ties }: TeamRecordInput): string {
   return ties > 0 ? `${wins}-${losses}-${ties}` : `${wins}-${losses}`;
 }
 
-export function arraysHaveSameItems(array1, array2) {
+export function arraysHaveSameItems(array1: string[], array2: string[]) {
   if (array1.length === array2.length) {
     return array1.every((element) => {
       if (array2.includes(element)) {
@@ -118,3 +120,65 @@ export function getTeamIcon(teamSlug: string): string {
     'https://frvypfdkmdsottjcsvay.supabase.co/storage/v1/object/public/team-assets';
   return `${avatarBucket}/${teamSlug}.png`;
 }
+
+export function getCurrentWeek(schedule: Schedule[]): Schedule {
+  const now = new Date();
+  // Hard check for before season- return first week
+  const first = schedule[0];
+  const last = schedule[schedule.length - 1];
+
+  if (now <= first.startDate) {
+    return first;
+  }
+  // Hard check for after season- return last week
+  if (now >= last.endDate) {
+    return last;
+  }
+
+  // Iterate
+  for (let i = 0; i < schedule.length - 1; i += 1) {
+    const week = schedule[i];
+    const next = schedule[i + 1];
+    // 1. If actively in the games (ie Thurs-Mon), it's that week
+    if (week.startDate < now && now < week.endDate) {
+      return week;
+    }
+    // 2. If after end date but before next start date
+    //    (ie Tues-Thurs), is next week
+    if (week.endDate < now && now < next.startDate) {
+      return next;
+    }
+  }
+}
+
+export const validateNickname = (nickname: string): boolean => {
+  const nickRegex = /^[a-z0-9]+(?:[_-][a-z0-9]+)*$/;
+  return nickRegex.test(nickname);
+};
+
+export const validateEmail = (email: string): boolean => {
+  const emailRegex = /^\S+@\S+\.\S+$/;
+  return emailRegex.test(email);
+};
+
+export const getDisplayName = (profile: Profile, fallback: string): string => {
+  if (profile.nickname) {
+    return profile.nickname;
+  } else if (profile.name) {
+    return profile.name;
+  } else {
+    return fallback;
+  }
+};
+
+export const currencyFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+});
+
+export const getFraudValueColor = (fraudValue: number): string => {
+  if (fraudValue > 95) return 'teal';
+  if (fraudValue > 40) return 'lime';
+  if (fraudValue < 0) return 'red';
+  return 'yellow';
+};

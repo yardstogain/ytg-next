@@ -3,54 +3,46 @@ import {
   createStyles,
   Navbar,
   Group,
-  Code,
   NavLink,
-  Anchor,
   Text,
-  Avatar,
   Box,
+  Skeleton,
 } from '@mantine/core';
 import {
-  BellRinging,
-  Fingerprint,
-  Key,
   Settings,
-  // 2fa,
-  DatabaseImport,
-  Receipt2,
-  SwitchHorizontal,
   Logout,
-  LockOpen,
-  Home,
   Home2,
   ListCheck,
   User,
-  UserX,
   Ladder,
   Share,
   Login,
-  Registered,
   UserPlus,
+  FilePlus,
 } from 'tabler-icons-react';
 import { LogoIcon } from './LogoIcon';
 import { NextLink } from '@mantine/next';
 import Link from 'next/link';
-import { getUserAvatar } from 'lib/utils';
 import { supabaseClient } from '@supabase/auth-helpers-nextjs';
 import { useUser } from '@supabase/auth-helpers-react';
-import router, { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
+import { Profile } from 'types/user';
+import { getDisplayName } from 'lib/utils';
 
 const useStyles = createStyles((theme, _params, getRef) => {
   const icon = getRef('icon');
   return {
     header: {
-      paddingBottom: theme.spacing.md,
+      padding: theme.spacing.sm,
+      paddingBottom: theme.spacing.xs,
+      background: theme.colors.dark[6],
+      borderRadius: theme.radius.md,
       marginBottom: theme.spacing.md,
-      borderBottom: `1px solid ${
-        theme.colorScheme === 'dark'
-          ? theme.colors.dark[4]
-          : theme.colors.gray[2]
-      }`,
+      // borderBottom: `1px solid ${
+      //   theme.colorScheme === 'dark'
+      //     ? theme.colors.dark[4]
+      //     : theme.colors.gray[2]
+      // }`,
     },
 
     footer: {
@@ -115,23 +107,27 @@ const useStyles = createStyles((theme, _params, getRef) => {
   };
 });
 
-type Profile = {
-  name: string;
-};
-
 export function Navigation() {
   const router = useRouter();
   const { classes, cx } = useStyles();
-  const [profile, setProfile] = useState<Profile | {}>({});
+  const [profile, setProfile] = useState<Profile>();
   const { user, error } = useUser();
 
   useEffect(() => {
     async function loadData() {
-      const { data } = await supabaseClient.from('profile').select('*');
-      setProfile(data[0]);
+      const { data } = await supabaseClient
+        .from<Profile>('profile')
+        .select('*')
+        .eq('id', user.id);
+
+      if (data) {
+        setProfile(data[0]);
+      }
     }
     // Only run query once user is logged in.
-    if (user) loadData();
+    if (user) {
+      loadData();
+    }
   }, [user]);
 
   return (
@@ -146,7 +142,7 @@ export function Navigation() {
       <Navbar.Section grow>
         <Group className={classes.header}>
           <Link href="/" passHref>
-            <Box component="a" sx={{ width: 280 }}>
+            <Box component="a" mx="auto" sx={{ width: 210 }}>
               <LogoIcon.Full />
             </Box>
           </Link>
@@ -154,16 +150,24 @@ export function Navigation() {
         <Group spacing={0} mb="md">
           {user ? (
             <>
-              <Text size="xs" weight={700} transform="uppercase" color="dimmed">
-                {profile.name}
-              </Text>
+              {profile ? (
+                <Text
+                  size="xs"
+                  weight={700}
+                  transform="uppercase"
+                  color="dimmed"
+                >
+                  {getDisplayName(profile, 'Account')}
+                </Text>
+              ) : (
+                <Skeleton radius="xl" height={18} width={64} />
+              )}
               <NavLink
                 className={classes.link}
                 component={NextLink}
-                href={`/player/${profile.nickname || user.id}`}
+                href={`/player/${profile?.nickname || user.id}`}
                 icon={<User className={classes.linkIcon} />}
                 label="My Profile"
-                active={router.pathname.includes('/player/')}
               />
               <NavLink
                 className={classes.link}
@@ -176,8 +180,16 @@ export function Navigation() {
               <NavLink
                 className={classes.link}
                 component={NextLink}
+                href="/posts/new"
+                icon={<FilePlus className={classes.linkIcon} />}
+                label="New Post"
+                active={router.pathname === '/posts/new'}
+              />
+              <NavLink
+                className={classes.link}
+                component={NextLink}
                 href="/settings"
-                icon={<UserPlus className={classes.linkIcon} />}
+                icon={<Settings className={classes.linkIcon} />}
                 label="Settings"
                 active={router.pathname === '/settings'}
               />

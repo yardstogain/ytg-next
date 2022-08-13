@@ -1,5 +1,5 @@
 //Tm,W,L,T,W-L%,PF,PA,PD,MoV,SoS,SRS,OSRS,DSRS
-export const fraudData = `Buffalo Bills,11,6,0,.647,483,289,194,11.4,-1.6,9.8,5.0,4.8
+export const stats2021 = `Buffalo Bills,11,6,0,.647,483,289,194,11.4,-1.6,9.8,5.0,4.8
 New England Patriots,10,7,0,.588,462,303,159,9.4,-0.9,8.5,3.6,4.8
 Miami Dolphins,9,8,0,.529,341,373,-32,-1.9,-0.8,-2.7,-3.1,0.3
 New York Jets,4,13,0,.235,310,504,-194,-11.4,1.0,-10.4,-3.6,-6.7

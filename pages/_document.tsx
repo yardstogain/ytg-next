@@ -1,6 +1,5 @@
 import React from 'react';
 import Document, { Html, Head, Main, NextScript } from 'next/document';
-import { darkTheme, getCssText } from '../stitches.config';
 import { createGetInitialProps } from '@mantine/next';
 
 const getInitialProps = createGetInitialProps();
@@ -10,11 +9,12 @@ export default class _Document extends Document {
 
   render() {
     return (
-      <Html lang="en" className={darkTheme.className}>
+      <Html lang="en">
         <Head>
-          <style
-            id="stitches"
-            dangerouslySetInnerHTML={{ __html: getCssText() }}
+          <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;500;700&display=swap"
+            rel="stylesheet"
           />
         </Head>
         <body>
