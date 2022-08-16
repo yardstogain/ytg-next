@@ -6,15 +6,12 @@ import {
   Group,
   Avatar,
   Text,
-  Container,
   Grid,
   Button,
   Card,
-  Skeleton,
   Title,
   Anchor,
   Paper,
-  Stack,
   Box,
 } from '@mantine/core';
 import {
@@ -23,19 +20,14 @@ import {
   getFraudValueColor,
   getTeamIcon,
   getTeamRecord,
+  teamLookup,
 } from 'lib/utils';
 import { useUser } from '@supabase/auth-helpers-react';
 import { supabaseClient } from '@supabase/auth-helpers-nextjs';
 import Link from 'next/link';
-import {
-  AlertCircle,
-  ArrowBackUp,
-  ArrowUp,
-  Check,
-  InfoCircle,
-  ListCheck,
-} from 'tabler-icons-react';
+import { AlertCircle, ArrowUp, Check, InfoCircle } from 'tabler-icons-react';
 import { showNotification } from '@mantine/notifications';
+import { FraudPicks, Schedule } from 'types/football';
 
 const useStyles = createStyles((theme) => ({
   rowSelected: {
@@ -47,6 +39,8 @@ const useStyles = createStyles((theme) => ({
 }));
 
 interface TeamSelectionProps {
+  activeFraudPicks: FraudPicks;
+  matchups: Schedule;
   teams: {
     name: string;
     wins: number;
@@ -74,10 +68,6 @@ export function TeamSelection({
       setBasePicks(activeFraudPicks.picks);
     }
   }, [activeFraudPicks]);
-
-  const teamLookup = teams.reduce((acc, curr) => {
-    return { [curr.id]: { ...curr }, ...acc };
-  }, {});
 
   const now = new Date();
   const weekIsLocked = now >= matchups.startDate;
@@ -129,16 +119,14 @@ export function TeamSelection({
       }
     } else {
       // create mode
-      const { error } = await supabaseClient
-        .from('fraudPicks')
-        .insert([
-          {
-            userId: user?.id,
-            week: matchups.week,
-            season: 2022,
-            picks: selection,
-          },
-        ]);
+      const { error } = await supabaseClient.from('fraudPicks').insert([
+        {
+          userId: user?.id,
+          week: matchups.week,
+          season: 2022,
+          picks: selection,
+        },
+      ]);
 
       if (!error) {
         setBasePicks([...selection]);

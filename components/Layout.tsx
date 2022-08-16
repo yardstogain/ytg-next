@@ -1,9 +1,13 @@
 import { Paper } from '@mantine/core';
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { Footer } from './Footer';
 import { Navigation } from './Navigation';
 
-export function Layout({ children }) {
+type LayoutProps = {
+  children: ReactElement;
+};
+
+export function Layout({ children }: LayoutProps) {
   return (
     <>
       <Navigation />

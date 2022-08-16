@@ -1,5 +1,6 @@
 import { User } from '@supabase/supabase-js';
-import { Schedule } from 'types/football';
+import { stats2021 } from 'data/stats2021';
+import { Schedule, SimpleTeamData } from 'types/football';
 import { Profile } from 'types/user';
 import { supabase } from './initSupabase';
 
@@ -17,36 +18,27 @@ export async function signOut() {
   }
 }
 
-export type SimpleTeamData = {
-  name: string;
-  icon: string;
-  wins: number;
-  losses: number;
-  ties: number;
-  fraudValue: number;
-};
-
 export function csvToTeamsData(csv: string): SimpleTeamData[] {
   // TODO: better line split
   const rows = csv.split(/\r\n|\n|\r/);
   return rows
     .map((row: string) => {
       const [name, ...stats] = row.split(',');
-      const numericalStats = stats.map((stat) => parseFloat(stat, 10));
+      const numericalStats = stats.map((stat) => parseFloat(stat));
 
       const [
         wins,
         losses,
         ties,
-        winPercent,
-        pointsFor,
-        pointsAgainst,
+        winPercent, //pointsFor //pointsAgainst
+        ,
+        ,
         pointDiff,
         marginOfVictory,
-        strengthOfSchedule,
-        frSrS,
-        frOSrS,
-        frDSrS,
+        strengthOfSchedule, //frSrS //frOSrS //frDSrS
+        ,
+        ,
+        ,
       ] = numericalStats;
 
       const fraudValue = getfraudValue({
@@ -121,6 +113,7 @@ export function getTeamIcon(teamSlug: string): string {
   return `${avatarBucket}/${teamSlug}.png`;
 }
 
+// TODO: is this air-tight?
 export function getCurrentWeek(schedule: Schedule[]): Schedule {
   const now = new Date();
   // Hard check for before season- return first week
@@ -131,24 +124,26 @@ export function getCurrentWeek(schedule: Schedule[]): Schedule {
     return first;
   }
   // Hard check for after season- return last week
-  if (now >= last.endDate) {
+  if (now > last.endDate) {
     return last;
   }
 
   // Iterate
+  let selectedWeek = last;
   for (let i = 0; i < schedule.length - 1; i += 1) {
     const week = schedule[i];
     const next = schedule[i + 1];
     // 1. If actively in the games (ie Thurs-Mon), it's that week
-    if (week.startDate < now && now < week.endDate) {
-      return week;
+    if (week.startDate <= now && now < week.endDate) {
+      selectedWeek = week;
     }
     // 2. If after end date but before next start date
     //    (ie Tues-Thurs), is next week
-    if (week.endDate < now && now < next.startDate) {
-      return next;
+    if (week.endDate < now && now <= next.startDate) {
+      selectedWeek = next;
     }
   }
+  return selectedWeek;
 }
 
 export const validateNickname = (nickname: string): boolean => {
@@ -161,7 +156,10 @@ export const validateEmail = (email: string): boolean => {
   return emailRegex.test(email);
 };
 
-export const getDisplayName = (profile: Profile, fallback: string): string => {
+export const getDisplayName = (
+  profile: Partial<Profile>,
+  fallback: string,
+): string => {
   if (profile.nickname) {
     return profile.nickname;
   } else if (profile.name) {
@@ -182,3 +180,16 @@ export const getFraudValueColor = (fraudValue: number): string => {
   if (fraudValue < 0) return 'red';
   return 'yellow';
 };
+
+export const isAdmin = (role: number) => {
+  return role >= 16;
+};
+
+export const teamData = csvToTeamsData(stats2021);
+
+export const teamLookup: Record<string, SimpleTeamData> = teamData.reduce(
+  (acc, curr) => {
+    return { [curr.id]: { ...curr }, ...acc };
+  },
+  {},
+);

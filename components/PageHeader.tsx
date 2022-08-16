@@ -1,7 +1,19 @@
-import React from 'react';
-import { Card, Group, Title, Text, Stack } from '@mantine/core';
+import React, { ReactNode } from 'react';
+import { Card, Group, Title, Text, Stack, MantineColor } from '@mantine/core';
 
-export function PageHeader({ title, description, iconColor, icon }) {
+type PageHeaderProps = {
+  title: string;
+  description: string;
+  iconColor: MantineColor;
+  icon: ReactNode;
+};
+
+export function PageHeader({
+  title,
+  description,
+  iconColor,
+  icon,
+}: PageHeaderProps) {
   return (
     <Card withBorder mt="xl" sx={{ background: 'transparent' }}>
       <Group spacing={0} align="flex-start" noWrap>

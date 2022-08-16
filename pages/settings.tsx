@@ -3,9 +3,7 @@ import {
   Card,
   Container,
   Group,
-  Input,
   Stack,
-  Text,
   TextInput,
 } from '@mantine/core';
 import { useInputState } from '@mantine/hooks';
@@ -19,7 +17,6 @@ import { PageHeader } from 'components';
 import { useState } from 'react';
 import {
   BallAmericanFootball,
-  BallFootball,
   Pencil,
   Settings,
   User as UserIcon,
@@ -32,12 +29,12 @@ export const getServerSideProps = withPageAuth({
     const { user } = await getUser(ctx);
 
     const { data } = await supabaseServerClient(ctx)
-      .from('profile')
+      .from<Profile>('profile')
       .select('*')
       .eq('id', user.id)
       .limit(1);
 
-    return { props: { profile: data[0] } };
+    return { props: { profile: data?.[0] } };
   },
 });
 
@@ -90,10 +87,14 @@ export default function SettingsHome({ user, profile }: SettingsProps) {
     const valid = validate();
 
     if (valid) {
-      const { data, error } = await supabaseClient
+      const { error } = await supabaseClient
         .from('profile')
         .update({ name, nickname, teamName, updatedAt: 'now()' })
         .match({ id: user.id });
+
+      if (error) {
+        console.log('Woopsie', error);
+      }
     }
     setLoading(false);
   };

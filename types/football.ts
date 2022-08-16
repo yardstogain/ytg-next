@@ -45,3 +45,23 @@ export type Schedule = {
   endDate: Date;
   matchups: Matchup[];
 };
+
+export type FraudPicks = {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
+  week: number;
+  season: number;
+  picks: TeamSlug[] | string[];
+};
+
+export type SimpleTeamData = {
+  id: TeamSlug | string;
+  name: string;
+  icon: string;
+  wins: number;
+  losses: number;
+  ties: number;
+  fraudValue: number;
+};

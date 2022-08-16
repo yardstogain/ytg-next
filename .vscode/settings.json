@@ -1,4 +1,11 @@
 {
   "git.ignoreLimitWarning": true,
-  "cSpell.words": ["Mantine", "matchups", "nextjs", "seahawks", "steelers"]
+  "cSpell.words": [
+    "Mantine",
+    "matchups",
+    "nextjs",
+    "seahawks",
+    "steelers",
+    "tabler"
+  ]
 }

@@ -7,11 +7,11 @@ import {
   Text,
   Box,
   Skeleton,
+  Badge,
 } from '@mantine/core';
 import {
   Settings,
   Logout,
-  Home2,
   ListCheck,
   User,
   Ladder,
@@ -19,6 +19,8 @@ import {
   Login,
   UserPlus,
   FilePlus,
+  Trophy,
+  LockAccess,
 } from 'tabler-icons-react';
 import { LogoIcon } from './LogoIcon';
 import { NextLink } from '@mantine/next';
@@ -27,7 +29,7 @@ import { supabaseClient } from '@supabase/auth-helpers-nextjs';
 import { useUser } from '@supabase/auth-helpers-react';
 import { useRouter } from 'next/router';
 import { Profile } from 'types/user';
-import { getDisplayName } from 'lib/utils';
+import { getDisplayName, isAdmin } from 'lib/utils';
 
 const useStyles = createStyles((theme, _params, getRef) => {
   const icon = getRef('icon');
@@ -88,6 +90,12 @@ const useStyles = createStyles((theme, _params, getRef) => {
       marginRight: theme.spacing.xs,
     },
 
+    adminLinkIcon: {
+      ref: icon,
+      color: theme.colors.grape,
+      marginRight: theme.spacing.xs,
+    },
+
     linkActive: {
       '&, &:hover': {
         backgroundColor: theme.fn.variant({
@@ -109,12 +117,14 @@ const useStyles = createStyles((theme, _params, getRef) => {
 
 export function Navigation() {
   const router = useRouter();
-  const { classes, cx } = useStyles();
+  const { classes } = useStyles();
   const [profile, setProfile] = useState<Profile>();
-  const { user, error } = useUser();
+  const { user } = useUser();
 
   useEffect(() => {
     async function loadData() {
+      if (!user) return;
+
       const { data } = await supabaseClient
         .from<Profile>('profile')
         .select('*')
@@ -151,14 +161,23 @@ export function Navigation() {
           {user ? (
             <>
               {profile ? (
-                <Text
-                  size="xs"
-                  weight={700}
-                  transform="uppercase"
-                  color="dimmed"
+                <Group
+                  spacing={0}
+                  position="apart"
+                  sx={{
+                    width: '100%',
+                  }}
                 >
-                  {getDisplayName(profile, 'Account')}
-                </Text>
+                  <Text
+                    size="xs"
+                    weight={700}
+                    transform="uppercase"
+                    color="dimmed"
+                  >
+                    {getDisplayName(profile, 'Account')}
+                  </Text>
+                  {isAdmin(profile?.role) && <Badge color="grape">Admin</Badge>}
+                </Group>
               ) : (
                 <Skeleton radius="xl" height={18} width={64} />
               )}
@@ -223,8 +242,8 @@ export function Navigation() {
           className={classes.link}
           component={NextLink}
           href="/fraud-list"
-          icon={<Home2 className={classes.linkIcon} />}
-          label="Home"
+          icon={<Trophy className={classes.linkIcon} />}
+          label="League"
           active={router.pathname === '/fraud-list'}
         />
         <NavLink
@@ -244,9 +263,18 @@ export function Navigation() {
           active={router.pathname === '/fraud-list/ladder'}
         />
       </Navbar.Section>
-
       {user && (
         <Navbar.Section className={classes.footer}>
+          {profile && isAdmin(profile.role) && (
+            <NavLink
+              className={classes.link}
+              component={NextLink}
+              href="/admin"
+              icon={<LockAccess className={classes.linkIcon} />}
+              label="Admin"
+              active={router.pathname.includes('/admin')}
+            />
+          )}
           <NavLink
             component="a"
             href="/api/auth/logout"

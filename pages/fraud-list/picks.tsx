@@ -1,14 +1,4 @@
-import {
-  Container,
-  Text,
-  List,
-  Card,
-  Group,
-  Stack,
-  Title,
-  Button,
-  Anchor,
-} from '@mantine/core';
+import { Container, Group, Title, Button } from '@mantine/core';
 import { PageHeader, TeamSelection } from 'components';
 import { csvToTeamsData, getCurrentWeek } from 'lib/utils';
 import { stats2021 } from 'data/stats2021';
@@ -16,19 +6,19 @@ import { schedule } from 'data/schedule2022';
 import {
   getUser,
   supabaseServerClient,
-  User,
+  // User,
   withPageAuth,
 } from '@supabase/auth-helpers-nextjs';
-import {
-  Clock,
-  ListCheck,
-  Timeline,
-  User as UserIcon,
-} from 'tabler-icons-react';
-import RelativeTime from '@yaireo/relative-time';
-import { NextLink } from '@mantine/next';
+import { ListCheck } from 'tabler-icons-react';
 import { useRouter } from 'next/router';
+import { Profile } from 'types/user';
+import { FraudPicks } from 'types/football';
 
+type FraudPicksWithPartialProfile = FraudPicks & {
+  profile: {
+    teamName: Profile['teamName'];
+  };
+};
 export const getServerSideProps = withPageAuth({
   redirectTo: '/login',
   async getServerSideProps(ctx) {
@@ -36,29 +26,25 @@ export const getServerSideProps = withPageAuth({
     const weekData = getCurrentWeek(schedule);
 
     const { data } = await supabaseServerClient(ctx)
-      .from('fraudPicks')
+      .from<FraudPicksWithPartialProfile>('fraudPicks')
       .select('*, profile(teamName)')
       .match({ week: weekData.week, season: 2022, userId: user.id })
       .limit(1);
 
-    return { props: { activeFraudPicks: data[0] } };
+    return { props: { activeFraudPicks: data?.[0] } };
   },
 });
 
 type FraudListProps = {
-  user: User;
+  // user: User;
+  activeFraudPicks: FraudPicksWithPartialProfile;
 };
 
 export default function FraudListPicks({
-  user,
+  // user,
   activeFraudPicks,
 }: FraudListProps) {
   const router = useRouter();
-
-  const relativeTime = new RelativeTime();
-
-  const season = 2022;
-  const week = 1;
 
   const weekData = getCurrentWeek(schedule);
   console.log('testing week: ', weekData.week);

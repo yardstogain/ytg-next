@@ -15,7 +15,7 @@ import { AlertCircle, Logout } from 'tabler-icons-react';
 import { useRouter } from 'next/router';
 
 export default function Login() {
-  const { user, error } = useUser();
+  const { user } = useUser();
   const router = useRouter();
   const [email, setEmail] = useInputState('');
   const [password, setPassword] = useInputState('');

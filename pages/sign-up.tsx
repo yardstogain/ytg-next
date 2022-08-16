@@ -19,14 +19,11 @@ import { PageHeader } from 'components';
 import {
   AlertCircle,
   BallAmericanFootball,
-  IceCream,
   Key,
   Lock,
-  Logout,
   Mail,
   Pencil,
   User,
-  UserCircle,
   UserPlus,
 } from 'tabler-icons-react';
 import { useRouter } from 'next/router';
@@ -34,7 +31,7 @@ import { betaKeys } from 'data/betaKeys';
 import { validateEmail, validateNickname } from 'lib/utils';
 
 export default function SignUp() {
-  const { user, error } = useUser();
+  const { user } = useUser();
   const router = useRouter();
   // Loading and error
   const [loading, setLoading] = useState(false);
@@ -122,6 +119,10 @@ export default function SignUp() {
           .from('profile')
           .update({ name, nickname, teamName, betaKey, updatedAt: 'now()' })
           .match({ id: user.id });
+
+        if (profileError) {
+          console.log('There was an error updating profile', profileError);
+        }
       }
     }
     setLoading(false);

@@ -6,13 +6,6 @@ import { UserProvider } from '@supabase/auth-helpers-react';
 import { NotificationsProvider } from '@mantine/notifications';
 
 export default function App({ Component, pageProps }: AppProps) {
-  // globalStyles();
-  // title: string;
-  // links: {
-  //   label: string;
-  //   link: string;
-  // }
-
   return (
     <UserProvider supabaseClient={supabaseClient}>
       <MantineProvider
