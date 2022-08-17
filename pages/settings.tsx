@@ -7,6 +7,7 @@ import {
   TextInput,
 } from '@mantine/core';
 import { useInputState } from '@mantine/hooks';
+import { showNotification } from '@mantine/notifications';
 import {
   getUser,
   supabaseClient,
@@ -14,9 +15,11 @@ import {
   withPageAuth,
 } from '@supabase/auth-helpers-nextjs';
 import { PageHeader } from 'components';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import {
   BallAmericanFootball,
+  Check,
   Pencil,
   Settings,
   User as UserIcon,
@@ -44,6 +47,8 @@ type SettingsProps = {
 };
 
 export default function SettingsHome({ user, profile }: SettingsProps) {
+  const router = useRouter();
+
   const [loading, setLoading] = useState(false);
   const [name, setName] = useInputState(profile.name || '');
   const [nickname, setNickname] = useInputState(profile.nickname || '');
@@ -92,7 +97,16 @@ export default function SettingsHome({ user, profile }: SettingsProps) {
         .update({ name, nickname, teamName, updatedAt: 'now()' })
         .match({ id: user.id });
 
-      if (error) {
+      if (!error) {
+        showNotification({
+          title: 'Profile updated!',
+          message: 'Nice hustle out there, Rudy',
+          color: 'teal',
+          icon: <Check />,
+        });
+        // Refresh SSR data
+        router.replace(router.asPath);
+      } else {
         console.log('Woopsie', error);
       }
     }

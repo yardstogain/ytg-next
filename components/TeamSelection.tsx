@@ -28,6 +28,7 @@ import Link from 'next/link';
 import { AlertCircle, ArrowUp, Check, InfoCircle } from 'tabler-icons-react';
 import { showNotification } from '@mantine/notifications';
 import { FraudPicks, Schedule } from 'types/football';
+import { useRouter } from 'next/router';
 
 const useStyles = createStyles((theme) => ({
   rowSelected: {
@@ -56,16 +57,16 @@ export function TeamSelection({
   activeFraudPicks,
   matchups,
 }: TeamSelectionProps) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const { user } = useUser();
   const { classes, cx } = useStyles();
   const [selection, setSelection] = useState<string[]>([]);
-  const [basePicks, setBasePicks] = useState<string[]>([]);
 
   useEffect(() => {
+    // If picks have been made, set the current selection to those picks
     if (activeFraudPicks.picks?.length > 0) {
       setSelection(activeFraudPicks.picks);
-      setBasePicks(activeFraudPicks.picks);
     }
   }, [activeFraudPicks]);
 
@@ -86,7 +87,7 @@ export function TeamSelection({
     setLoading(true);
     if (activeFraudPicks.picks?.length > 0) {
       // update mode
-      if (arraysHaveSameItems(selection, basePicks)) {
+      if (arraysHaveSameItems(selection, activeFraudPicks.picks)) {
         showNotification({
           title: 'Picks are the same',
           message: 'What do you think these servers grow on trees?',
@@ -100,14 +101,14 @@ export function TeamSelection({
           .match({ userId: user?.id, week: matchups.week, season: 2022 });
 
         if (!error) {
-          setBasePicks([...selection]);
-
           showNotification({
             title: 'Picks updated!',
             message: `You now have ${totalWager()} on the line`,
             color: 'teal',
             icon: <Check />,
           });
+          // Refresh SSR data
+          router.replace(router.asPath);
         } else {
           showNotification({
             title: 'Update failed',
@@ -129,14 +130,14 @@ export function TeamSelection({
       ]);
 
       if (!error) {
-        setBasePicks([...selection]);
-
         showNotification({
           title: 'Picks made!',
           message: `You put ${totalWager()} on the line`,
           color: 'teal',
           icon: <Check />,
         });
+        // Refresh SSR data
+        router.replace(router.asPath);
       } else {
         showNotification({
           title: 'Woopsie!',
