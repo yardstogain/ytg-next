@@ -28,7 +28,7 @@ import {
 } from 'tabler-icons-react';
 import { useRouter } from 'next/router';
 import { betaKeys } from 'data/betaKeys';
-import { validateEmail, validateNickname } from 'lib/utils';
+import { validateEmail } from 'lib/utils';
 import slugify from 'slugify';
 
 export default function SignUp() {

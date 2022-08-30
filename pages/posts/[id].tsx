@@ -65,9 +65,9 @@ function ContentAuthor({ profile }: ContentAuthorProps) {
 }
 
 function SingleComment({
-  id,
+  // id,
   markdownContent,
-  createdAt,
+  // createdAt,
   profile,
 }: Pick<EnhancedComment, 'id' | 'markdownContent' | 'createdAt' | 'profile'>) {
   return (

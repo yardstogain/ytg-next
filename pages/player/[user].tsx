@@ -1,6 +1,5 @@
 import { Container, Text } from '@mantine/core';
 import {
-  getUser,
   supabaseServerClient,
   User,
   withPageAuth,

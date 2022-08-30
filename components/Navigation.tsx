@@ -7,7 +7,6 @@ import {
   Text,
   Box,
   Skeleton,
-  Badge,
 } from '@mantine/core';
 import {
   Settings,
@@ -29,7 +28,7 @@ import { supabaseClient } from '@supabase/auth-helpers-nextjs';
 import { useUser } from '@supabase/auth-helpers-react';
 import { useRouter } from 'next/router';
 import { Profile } from 'types/user';
-import { getDisplayName, isAdmin } from 'lib/utils';
+import { isAdmin } from 'lib/utils';
 
 const useStyles = createStyles((theme, _params, getRef) => {
   const icon = getRef('icon');
