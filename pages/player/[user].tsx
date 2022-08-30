@@ -15,7 +15,7 @@ export const getServerSideProps = withPageAuth({
     const { data } = await supabaseServerClient(ctx)
       .from<Profile>('profile')
       .select('*')
-      .match({ [user.length === 36 ? 'id' : 'nickname']: user })
+      .match({ slug: user })
       .limit(1);
 
     return { props: { profile: data?.[0] } };

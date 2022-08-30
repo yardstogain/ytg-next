@@ -174,9 +174,8 @@ export function Navigation() {
                     transform="uppercase"
                     color="dimmed"
                   >
-                    {getDisplayName(profile, 'Account')}
+                    {profile.nickname}
                   </Text>
-                  {isAdmin(profile?.role) && <Badge color="grape">Admin</Badge>}
                 </Group>
               ) : (
                 <Skeleton radius="xl" height={18} width={64} />
@@ -184,7 +183,7 @@ export function Navigation() {
               <NavLink
                 className={classes.link}
                 component={NextLink}
-                href={`/player/${profile?.nickname || user.id}`}
+                href={`/player/${profile?.slug}`}
                 icon={<User className={classes.linkIcon} />}
                 label="My Profile"
               />
