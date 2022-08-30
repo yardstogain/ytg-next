@@ -19,6 +19,7 @@ type FraudPicksWithPartialProfile = FraudPicks & {
     teamName: Profile['teamName'];
   };
 };
+
 export const getServerSideProps = withPageAuth({
   redirectTo: '/login',
   async getServerSideProps(ctx) {
@@ -31,7 +32,7 @@ export const getServerSideProps = withPageAuth({
       .match({ week: weekData.week, season: 2022, userId: user.id })
       .limit(1);
 
-    return { props: { activeFraudPicks: data?.[0] } };
+    return { props: { activeFraudPicks: data?.[0] || [] } };
   },
 });
 
@@ -61,7 +62,7 @@ export default function FraudListPicks({
       />
       <Group spacing={0} position="apart" mt="xl">
         <Group spacing="xs">
-          <Title order={2}>{activeFraudPicks.profile.teamName}</Title>
+          <Title order={2}>My Picks</Title>
         </Group>
         <Button
           leftIcon={<ListCheck />}

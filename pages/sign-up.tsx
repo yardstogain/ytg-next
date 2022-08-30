@@ -120,7 +120,7 @@ export default function SignUp() {
             nickname,
             teamName,
             betaKey,
-            slug: slugify(nickname),
+            slug: slugify(nickname, { lower: true, strict: true }),
             updatedAt: 'now()',
           })
           .match({ id: user.id });
