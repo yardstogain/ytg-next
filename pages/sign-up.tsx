@@ -28,7 +28,8 @@ import {
 } from 'tabler-icons-react';
 import { useRouter } from 'next/router';
 import { betaKeys } from 'data/betaKeys';
-import { validateEmail, validateNickname } from 'lib/utils';
+import { validateEmail } from 'lib/utils';
+import slugify from 'slugify';
 
 export default function SignUp() {
   const { user } = useUser();
@@ -86,10 +87,7 @@ export default function SignUp() {
     if (!validateEmail(email)) {
       errorCache.push(`Email isn't real`);
     }
-    // 4. Check nickname format
-    if (nickname.length > 0 && !validateNickname(nickname)) {
-      errorCache.push(`Follow the nickname rules`);
-    }
+
     setErrors([...errorCache]);
     return errorCache.length === 0;
   };
@@ -117,7 +115,14 @@ export default function SignUp() {
       if (user) {
         const { error: profileError } = await supabaseClient
           .from('profile')
-          .update({ name, nickname, teamName, betaKey, updatedAt: 'now()' })
+          .update({
+            name,
+            nickname,
+            teamName,
+            betaKey,
+            slug: slugify(nickname, { lower: true, strict: true }),
+            updatedAt: 'now()',
+          })
           .match({ id: user.id });
 
         if (profileError) {
@@ -231,6 +236,7 @@ export default function SignUp() {
           icon={<User />}
           value={nickname}
           onChange={setNickname}
+          required
         />
       </Stack>
       <Card mt="xl" shadow="md" withBorder>

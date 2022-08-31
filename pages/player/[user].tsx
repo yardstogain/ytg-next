@@ -1,6 +1,5 @@
 import { Container, Text } from '@mantine/core';
 import {
-  getUser,
   supabaseServerClient,
   User,
   withPageAuth,
@@ -10,12 +9,12 @@ import { Profile } from 'types/user';
 export const getServerSideProps = withPageAuth({
   redirectTo: '/login',
   async getServerSideProps(ctx) {
-    const { user } = await getUser(ctx);
+    // const { user } = await getUser(ctx);
     // Run queries with RLS on the server
     const { data } = await supabaseServerClient(ctx)
       .from<Profile>('profile')
       .select('*')
-      .match({ [user.length === 36 ? 'id' : 'nickname']: user })
+      .match({ slug: ctx.query.user })
       .limit(1);
 
     return { props: { profile: data?.[0] } };

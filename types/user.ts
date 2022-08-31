@@ -10,4 +10,5 @@ export type Profile = {
   nickname: string;
   teamName: string;
   role: number;
+  slug: string;
 };

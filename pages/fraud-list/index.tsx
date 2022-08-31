@@ -21,7 +21,6 @@ import { PageHeader } from 'components';
 import {
   currencyFormatter,
   getCurrentWeek,
-  getDisplayName,
   getTeamIcon,
   getFraudValueColor,
   teamLookup,
@@ -43,7 +42,7 @@ export const getServerSideProps = withPageAuth({
 
     const { data } = await supabaseServerClient(ctx)
       .from<ProfileWithFraudPicks>('profile')
-      .select(`id, name, nickname, teamName, fraudPicks(*)`)
+      .select(`id, name, nickname, teamName, slug, fraudPicks(*)`)
       .match({ 'fraudPicks.week': weekData.week, 'fraudPicks.season': 2022 });
 
     return {
@@ -119,13 +118,8 @@ FraudListHomeProps) {
             lineHeight: 1,
           }}
         >
-          <Link href={`/player/${team.nickname || team.id}`} passHref>
-            <Anchor color="dimmed">
-              {getDisplayName(
-                { name: team.name, nickname: team.nickname },
-                'No namer',
-              )}
-            </Anchor>
+          <Link href={`/player/${team.slug}`} passHref>
+            <Anchor color="dimmed">{team.nickname}</Anchor>
           </Link>
         </Text>
       </td>

@@ -7,7 +7,6 @@ import {
   Text,
   Box,
   Skeleton,
-  Badge,
 } from '@mantine/core';
 import {
   Settings,
@@ -29,7 +28,7 @@ import { supabaseClient } from '@supabase/auth-helpers-nextjs';
 import { useUser } from '@supabase/auth-helpers-react';
 import { useRouter } from 'next/router';
 import { Profile } from 'types/user';
-import { getDisplayName, isAdmin } from 'lib/utils';
+import { isAdmin } from 'lib/utils';
 
 const useStyles = createStyles((theme, _params, getRef) => {
   const icon = getRef('icon');
@@ -174,9 +173,8 @@ export function Navigation() {
                     transform="uppercase"
                     color="dimmed"
                   >
-                    {getDisplayName(profile, 'Account')}
+                    {profile.nickname}
                   </Text>
-                  {isAdmin(profile?.role) && <Badge color="grape">Admin</Badge>}
                 </Group>
               ) : (
                 <Skeleton radius="xl" height={18} width={64} />
@@ -184,7 +182,7 @@ export function Navigation() {
               <NavLink
                 className={classes.link}
                 component={NextLink}
-                href={`/player/${profile?.nickname || user.id}`}
+                href={`/player/${profile?.slug}`}
                 icon={<User className={classes.linkIcon} />}
                 label="My Profile"
               />
