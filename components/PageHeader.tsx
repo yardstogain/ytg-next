@@ -19,7 +19,9 @@ export function PageHeader({
       <Group spacing={0} align="flex-start" noWrap>
         <Text color={iconColor}>{icon}</Text>
         <Stack spacing={0} ml="md">
-          <Title order={1}>{title}</Title>
+          <Title order={1} sx={{ fontFamily: 'Righteous' }}>
+            {title}
+          </Title>
           <Text color="dimmed" mt="sm" size="lg">
             {description}
           </Text>
