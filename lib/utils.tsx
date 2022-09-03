@@ -1,5 +1,6 @@
 import { MantineColor } from '@mantine/core';
 import { User } from '@supabase/supabase-js';
+import RelativeTime from '@yaireo/relative-time';
 import { stats2021 } from 'data/stats2021';
 import Head from 'next/head';
 import { Schedule, SimpleTeamData, TeamSlug } from 'types/football';
@@ -229,3 +230,5 @@ export const renderPageTitle = (title: string) => (
     <meta property="og:title" content={`${title} | The Pool`} key="title" />
   </Head>
 );
+
+export const relativeTime = new RelativeTime();
