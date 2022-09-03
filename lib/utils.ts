@@ -1,7 +1,8 @@
 import { User } from '@supabase/supabase-js';
 import { stats2021 } from 'data/stats2021';
-import { Schedule, SimpleTeamData } from 'types/football';
+import { Schedule, SimpleTeamData, TeamSlug } from 'types/football';
 import { Profile } from 'types/user';
+import { roles } from './constants';
 import { supabase } from './initSupabase';
 
 export function isLoggedIn(user: User | null) {
@@ -70,10 +71,11 @@ export function getfraudValue({
   strengthOfSchedule,
 }: fraudValueInput): number {
   return (
-    winPercent * 1.0 +
-    pointDiff * 0.6 +
-    marginOfVictory * 0.6 +
-    strengthOfSchedule * 0.5
+    (winPercent * 0.75 +
+      pointDiff * 1.1 +
+      marginOfVictory * 0.35 +
+      strengthOfSchedule * 0.75) /
+    10
   );
 }
 
@@ -175,14 +177,14 @@ export const currencyFormatter = new Intl.NumberFormat('en-US', {
 });
 
 export const getFraudValueColor = (fraudValue: number): string => {
-  if (fraudValue > 95) return 'teal';
-  if (fraudValue > 40) return 'lime';
+  if (fraudValue > 15) return 'teal';
+  if (fraudValue > 7.5) return 'lime';
   if (fraudValue < 0) return 'red';
   return 'yellow';
 };
 
 export const isAdmin = (role: number) => {
-  return role >= 16;
+  return role >= roles.admin;
 };
 
 export const teamData = csvToTeamsData(stats2021);
@@ -193,3 +195,15 @@ export const teamLookup: Record<string, SimpleTeamData> = teamData.reduce(
   },
   {},
 );
+
+export const calculateFraudListWinnings = (
+  picks: TeamSlug[],
+  losers: TeamSlug[],
+): number => {
+  return picks.reduce((acc, curr) => {
+    if (losers.includes(curr)) {
+      return acc + teamLookup[curr].fraudValue;
+    }
+    return acc;
+  }, 0);
+};

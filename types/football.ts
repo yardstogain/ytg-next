@@ -1,3 +1,5 @@
+import { Profile } from './user';
+
 export type TeamSlug =
   | 'buffalo-bills'
   | 'dallas-cowboys'
@@ -50,10 +52,10 @@ export type FraudPicks = {
   id: number;
   createdAt: string;
   updatedAt: string;
-  userId: string;
+  userId: Profile['id'];
   week: number;
   season: number;
-  picks: TeamSlug[] | string[];
+  picks: TeamSlug[];
 };
 
 export type SimpleTeamData = {
@@ -64,4 +66,20 @@ export type SimpleTeamData = {
   losses: number;
   ties: number;
   fraudValue: number;
+};
+
+export type FraudListResults = {
+  createdAt: string;
+  updatedAt: string;
+  updatedBy: Profile['id'];
+  week: number;
+  season: number;
+  losers: TeamSlug[];
+};
+
+export type FraudListWinnings = {
+  userId: Profile['id'];
+  winnings: number;
+  week: number;
+  season: number;
 };

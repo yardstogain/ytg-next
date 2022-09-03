@@ -22,7 +22,10 @@ export function Layout({ children }: LayoutProps) {
         {children}
         <Footer
           data={[
-            { title: 'cats', links: [{ label: 'kittis', link: '/cats' }] },
+            {
+              title: 'Games',
+              links: [{ label: 'Fraud List', link: '/fraud-list/about' }],
+            },
           ]}
         />
       </Paper>
