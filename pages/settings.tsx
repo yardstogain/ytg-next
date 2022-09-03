@@ -2,9 +2,12 @@ import {
   Button,
   Card,
   Container,
+  FileButton,
   Group,
   Stack,
   TextInput,
+  Text,
+  Avatar,
 } from '@mantine/core';
 import { useInputState } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
@@ -15,7 +18,7 @@ import {
   withPageAuth,
 } from '@supabase/auth-helpers-nextjs';
 import { PageHeader } from 'components';
-import { renderPageTitle } from 'lib/utils';
+import { getUserAvatar, renderPageTitle } from 'lib/utils';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import {
@@ -55,12 +58,14 @@ export default function SettingsHome({ user, profile }: SettingsProps) {
   const [nickname, setNickname] = useInputState(profile.nickname || '');
   const [nicknameError, setNicknameError] = useState('');
   const [teamName, setTeamName] = useInputState(profile.teamName || '');
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   const reset = () => {
     // Fields
     setName(profile.name);
     setNickname(profile.nickname);
     setTeamName(profile.teamName);
+    setAvatarFile(null);
     // Errors
     setNicknameError('');
   };
@@ -93,12 +98,26 @@ export default function SettingsHome({ user, profile }: SettingsProps) {
     const valid = validate();
 
     if (valid) {
-      const { error } = await supabaseClient
+      const { error: profileError } = await supabaseClient
         .from('profile')
         .update({ name, nickname, teamName, updatedAt: 'now()' })
         .match({ id: user.id });
 
-      if (!error) {
+      if (avatarFile) {
+        const { data, error: avatarError } = await supabaseClient.storage
+          .from('avatars')
+          .upload(`${user.id}.png`, avatarFile, {
+            upsert: true,
+          });
+
+        console.log('ad', data);
+
+        if (avatarError) {
+          console.log('Error uploading avatar', avatarError);
+        }
+      }
+
+      if (!profileError) {
         showNotification({
           title: 'Profile updated!',
           message: 'Nice hustle out there, Rudy',
@@ -108,11 +127,14 @@ export default function SettingsHome({ user, profile }: SettingsProps) {
         // Refresh SSR data
         router.replace(router.asPath);
       } else {
-        console.log('Woopsie', error);
+        console.log('Woopsie', profileError);
       }
     }
+    reset();
     setLoading(false);
   };
+
+  console.log('af', avatarFile);
 
   return (
     <Container size="lg">
@@ -150,6 +172,34 @@ export default function SettingsHome({ user, profile }: SettingsProps) {
             onChange={setNickname}
             error={nicknameError}
           />
+          <Stack spacing={0}>
+            <Text>Avatar</Text>
+            <Text size="sm" color="dimmed">
+              Select a file to upload a custom image, PNG or JPEG
+            </Text>
+            <Group mt="md" align="center">
+              <Avatar
+                radius="xl"
+                size={64}
+                src={
+                  avatarFile
+                    ? URL.createObjectURL(avatarFile)
+                    : `${getUserAvatar(user.id)}?t=${new Date().getTime()}`
+                }
+              >
+                <UserIcon />
+              </Avatar>
+              <FileButton
+                onChange={setAvatarFile}
+                accept="image/png,image/jpeg"
+              >
+                {(props) => <Button {...props}>Select image</Button>}
+              </FileButton>
+              {avatarFile && (
+                <Text size="sm">Picked file: {avatarFile.name}</Text>
+              )}
+            </Group>
+          </Stack>
         </Stack>
         <Card mt="xl" shadow="md" withBorder>
           <Group spacing="sm">
@@ -160,7 +210,8 @@ export default function SettingsHome({ user, profile }: SettingsProps) {
               disabled={
                 name === profile.name &&
                 nickname === profile.nickname &&
-                teamName === profile.teamName
+                teamName === profile.teamName &&
+                avatarFile == null
               }
             >
               Save
