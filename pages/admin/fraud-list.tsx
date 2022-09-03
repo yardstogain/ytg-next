@@ -28,6 +28,7 @@ import {
   currencyFormatter,
   calculateFraudListWinnings,
   isAdmin,
+  renderPageTitle,
 } from 'lib/utils';
 import { useState } from 'react';
 import { FraudListWinnings, FraudPicks, TeamSlug } from 'types/football';
@@ -117,6 +118,7 @@ export default function AdminFraudList() {
 
   return (
     <Container size="lg">
+      {renderPageTitle('Fraud List - Admin')}
       <AdminTabs />
       <Stack mt="xl" sx={{ width: '68%', minWidth: 688 }}>
         <Title order={3}>Fraud List Results</Title>

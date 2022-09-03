@@ -5,7 +5,7 @@ import {
   withPageAuth,
 } from '@supabase/auth-helpers-nextjs';
 import { AdminTabs, RoleBadge } from 'components';
-import { isAdmin } from 'lib/utils';
+import { renderPageTitle, isAdmin } from 'lib/utils';
 import { Profile } from 'types/user';
 
 export const getServerSideProps = withPageAuth({
@@ -42,6 +42,7 @@ type AdminUsersProps = {
 export default function AdminUsers({ allUsers }: AdminUsersProps) {
   return (
     <Container size="lg">
+      {renderPageTitle('User Management - Admin')}
       <AdminTabs />
       <Text>Manage the users here (ban, change role, view profile)</Text>
       {allUsers.map((user) => (

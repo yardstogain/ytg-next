@@ -13,6 +13,7 @@ import { useUser } from '@supabase/auth-helpers-react';
 import { PageHeader } from 'components';
 import { AlertCircle, Logout } from 'tabler-icons-react';
 import { useRouter } from 'next/router';
+import { renderPageTitle } from 'lib/utils';
 
 export default function Login() {
   const { user } = useUser();
@@ -50,6 +51,7 @@ export default function Login() {
 
   return (
     <Container size="lg">
+      {renderPageTitle('Log in')}
       <PageHeader
         title="Log in"
         description="To play games, acquire bragging rights, and ruin your next family dinner, you'll need to log in."

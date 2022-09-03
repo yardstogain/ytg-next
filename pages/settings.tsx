@@ -15,6 +15,7 @@ import {
   withPageAuth,
 } from '@supabase/auth-helpers-nextjs';
 import { PageHeader } from 'components';
+import { renderPageTitle } from 'lib/utils';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import {
@@ -115,6 +116,7 @@ export default function SettingsHome({ user, profile }: SettingsProps) {
 
   return (
     <Container size="lg">
+      {renderPageTitle('Settings')}
       <PageHeader
         title="Settings"
         description="If you're not changing your team name during the season to talk shit then I don't want to know you"

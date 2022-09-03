@@ -1,8 +1,10 @@
 import { Container, Text, List } from '@mantine/core';
+import { renderPageTitle } from 'lib/utils';
 
 export default function Index() {
   return (
-    <Container>
+    <Container size="xl">
+      {renderPageTitle('Home')}
       <Text>Todo</Text>
       <List>
         Fraud List

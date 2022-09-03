@@ -8,7 +8,7 @@ import { Profile } from 'types/user';
 import { AdminStat, AdminTabs } from 'components';
 import { File, MessageCircle, User } from 'tabler-icons-react';
 import { Comment, Content } from 'types/content';
-import { isAdmin } from 'lib/utils';
+import { isAdmin, renderPageTitle } from 'lib/utils';
 
 export const getServerSideProps = withPageAuth({
   redirectTo: '/login',
@@ -63,6 +63,7 @@ export default function AdminHome({
   console.log('p', numPosts);
   return (
     <Container size="lg">
+      {renderPageTitle('Dashboard - Admin')}
       <AdminTabs />
       <Title order={4} mt="xl">
         User Stats

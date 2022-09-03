@@ -1,6 +1,6 @@
 import { Container, Group, Title, Button } from '@mantine/core';
 import { PageHeader, TeamSelection } from 'components';
-import { csvToTeamsData, getCurrentWeek } from 'lib/utils';
+import { csvToTeamsData, getCurrentWeek, renderPageTitle } from 'lib/utils';
 import { stats2021 } from 'data/stats2021';
 import { schedule } from 'data/schedule2022';
 import {
@@ -17,6 +17,7 @@ import { FraudPicks } from 'types/football';
 type FraudPicksWithPartialProfile = FraudPicks & {
   profile: {
     teamName: Profile['teamName'];
+    slug: Profile['slug'];
   };
 };
 
@@ -28,7 +29,7 @@ export const getServerSideProps = withPageAuth({
 
     const { data } = await supabaseServerClient(ctx)
       .from<FraudPicksWithPartialProfile>('fraudPicks')
-      .select('*, profile(teamName)')
+      .select('*, profile(teamName, slug)')
       .match({ week: weekData.week, season: 2022, userId: user.id })
       .single();
 
@@ -52,6 +53,7 @@ export default function FraudListPicks({
   console.log('afp', activeFraudPicks);
   return (
     <Container size="lg">
+      {renderPageTitle('Picks - Fraud List')}
       <PageHeader
         title={`Fraud List Week ${weekData.week} Picks`}
         description="Pick three teams that you think will lose this week. The more you
@@ -68,10 +70,10 @@ export default function FraudListPicks({
           leftIcon={<ListCheck />}
           variant="outline"
           onClick={() => {
-            router.push('/fraud-list/history');
+            router.push(`/player/${activeFraudPicks.profile.slug}`);
           }}
         >
-          Pick History
+          Previous Picks on Profile
         </Button>
       </Group>
       <TeamSelection
