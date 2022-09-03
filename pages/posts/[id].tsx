@@ -1,19 +1,40 @@
 import {
   Anchor,
   Avatar,
+  Badge,
+  Box,
+  Button,
   Card,
   Container,
+  Grid,
   Group,
   Stack,
   Text,
+  Textarea,
+  Title,
 } from '@mantine/core';
+import { useInputState } from '@mantine/hooks';
 import {
+  supabaseClient,
   supabaseServerClient,
+  User,
   withPageAuth,
 } from '@supabase/auth-helpers-nextjs';
-import { renderPageTitle } from 'lib/utils';
+import { relativeTime, renderPageTitle } from 'lib/utils';
 import Link from 'next/link';
-import { Comment, Content } from 'types/content';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import {
+  ArrowDown,
+  Calendar,
+  FileArrowLeft,
+  FilePlus,
+  MessageCircle,
+  Speakerphone,
+  Tags,
+  User as UserIcon,
+} from 'tabler-icons-react';
+import { Comment, Content, Tag } from 'types/content';
 import { Profile } from 'types/user';
 
 type EnhancedComment = Comment & {
@@ -28,7 +49,7 @@ type EnhancedContent = Content & {
 export const getServerSideProps = withPageAuth({
   redirectTo: '/login',
   async getServerSideProps(ctx) {
-    const { data } = await supabaseServerClient(ctx)
+    const { data: content } = await supabaseServerClient(ctx)
       .from<EnhancedContent>('content')
       .select(
         `
@@ -37,81 +58,284 @@ export const getServerSideProps = withPageAuth({
         comments(*, profile(nickname, teamName, slug))
         `,
       )
-      .match({ id: ctx.query.id });
+      .match({ id: ctx.query.id })
+      .single();
 
-    return { props: { content: data?.[0] } };
+    if (!content) {
+      return {
+        notFound: true,
+      };
+    }
+
+    const { data: taggedUsers } = await supabaseServerClient(ctx)
+      .from<Profile>('profile')
+      .select('nickname, slug')
+      .in('id', [...content.playerTags]);
+
+    const { data: tags } = await supabaseServerClient(ctx)
+      .from<Tag>('tags')
+      .select('*')
+      .in('slug', [...content.tags]);
+
+    return { props: { content, taggedUsers, tags } };
   },
 });
 
-type SinglePostProps = {
-  content: EnhancedContent;
-};
-
 type ContentAuthorProps = {
   profile: EnhancedContent['profile'];
+  isOp?: boolean;
 };
 
-function ContentAuthor({ profile }: ContentAuthorProps) {
+function ContentAuthor({ profile, isOp }: ContentAuthorProps) {
   return (
-    <Group>
-      <Avatar radius="xl">{profile.nickname}</Avatar>
-      <Stack>
-        <Link href={`/profile/${profile.slug}`} passHref>
-          <Anchor component="a">{profile.nickname}</Anchor>
-        </Link>
-        <Text>{profile.teamName}</Text>
+    <Group spacing={0}>
+      <Avatar radius="xl" color="pink">
+        <UserIcon />
+      </Avatar>
+      <Stack spacing={0} ml="xs">
+        <Group spacing={0}>
+          <Link href={`/player/${profile.slug}`} passHref>
+            <Anchor component="a" weight="bold">
+              <Text color="white">{profile.nickname}</Text>
+            </Anchor>
+          </Link>
+          {isOp && (
+            <Badge size="sm" ml="xs">
+              OP
+            </Badge>
+          )}
+        </Group>
+
+        <Text color="dimmed" size="sm">
+          {profile.teamName}
+        </Text>
       </Stack>
     </Group>
   );
 }
 
+type SingleCommentProps = Pick<
+  EnhancedComment,
+  'id' | 'markdownContent' | 'createdAt' | 'profile'
+> & {
+  isOp?: boolean;
+};
+
 function SingleComment({
-  // id,
+  id,
   markdownContent,
-  // createdAt,
+  createdAt,
   profile,
-}: Pick<EnhancedComment, 'id' | 'markdownContent' | 'createdAt' | 'profile'>) {
+  isOp,
+}: SingleCommentProps) {
   return (
-    <Stack>
-      <ContentAuthor profile={profile} />
-      <Text>{markdownContent}</Text>
+    <Stack
+      id={`comment-${id}`}
+      p="md"
+      spacing={0}
+      sx={(theme) => ({
+        borderBottom: `1px solid ${theme.colors.gray[8]}`,
+      })}
+    >
+      <ContentAuthor profile={profile} isOp={isOp} />
+      <Text size="md" mt="sm">
+        {markdownContent}
+      </Text>
+      <Group spacing={8} mt="sm">
+        <Text color="dimmed" sx={{ lineHeight: 1 }}>
+          <Calendar size={14} />
+        </Text>
+        <Text size="sm" color="dimmed">
+          {relativeTime.from(new Date(createdAt))}
+        </Text>
+      </Group>
     </Stack>
   );
 }
 
-export default function SinglePost({ content }: SinglePostProps) {
+type SinglePostProps = {
+  content: EnhancedContent;
+  taggedUsers: Profile[];
+  tags: Tag[];
+  user: User;
+};
+
+export default function SinglePost({
+  content,
+  taggedUsers,
+  tags,
+  user,
+}: SinglePostProps) {
+  const router = useRouter();
+  const [commentContent, setCommentContent] = useInputState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleCommentSubmit = async () => {
+    setLoading(true);
+
+    const { error } = await supabaseClient.from<Comment>('comments').insert({
+      author: user.id,
+      contentId: content.id,
+      markdownContent: commentContent,
+    });
+
+    if (!error) {
+      router.replace(router.asPath);
+    }
+    setCommentContent('');
+    setLoading(false);
+  };
+
+  const sortedComments = content.comments.sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+  );
+
   return (
     <Container size="lg">
       {renderPageTitle(`Post by ${content.profile.nickname}`)}
-      {/* <code>{JSON.stringify(content)}</code> */}
-      <ContentAuthor profile={content.profile} />
-      <Text>{content.markdownContent}</Text>
-      <Group>
-        <Stack>
-          <Text>Called out</Text>
-          {content.playerTags.map((player) => (
-            <Text>{player}</Text>
-          ))}
-        </Stack>
-        <Stack>
-          <Text>Tags</Text>
-          {content.tags.map((tag) => (
-            <Text>{tag}</Text>
-          ))}
-        </Stack>
+      <Group position="apart" my="xl">
+        <Link href="/posts" passHref>
+          <Button component="a" variant="outline" leftIcon={<FileArrowLeft />}>
+            All Posts
+          </Button>
+        </Link>
       </Group>
-      {content.comments.length > 0 && (
-        <Card withBorder shadow="md">
-          {content.comments.map((comment) => (
-            <SingleComment
-              id={comment.id}
-              markdownContent={comment.markdownContent}
-              createdAt={comment.createdAt}
-              profile={comment.profile}
-            />
-          ))}
-        </Card>
-      )}
+      <Grid gutter="xl">
+        <Grid.Col span={8}>
+          <ContentAuthor profile={content.profile} />
+          <Text size="xl" mt="md">
+            {content.markdownContent}
+          </Text>
+          <Group spacing={0} mt="sm">
+            <Group spacing={8}>
+              <Text color="dimmed" sx={{ lineHeight: 1 }}>
+                <Calendar size={14} />
+              </Text>
+              <Text size="sm" color="dimmed">
+                {relativeTime.from(new Date(content.createdAt))}
+              </Text>
+            </Group>
+          </Group>
+
+          <>
+            <Group position="apart" align="center">
+              <Title order={3} mt="xl" mb="md">
+                {sortedComments.length}{' '}
+                {sortedComments.length === 1 ? 'Reply' : 'Replies'}
+              </Title>
+              {sortedComments.length > 0 && (
+                <Button
+                  component="a"
+                  href="#comment-form"
+                  variant="subtle"
+                  leftIcon={<ArrowDown size={16} />}
+                >
+                  Jump to reply form
+                </Button>
+              )}
+            </Group>
+
+            <Card withBorder p={0} sx={{ background: 'transparent' }}>
+              {sortedComments.map((comment) => (
+                <SingleComment
+                  key={comment.id}
+                  id={comment.id}
+                  markdownContent={comment.markdownContent}
+                  createdAt={comment.createdAt}
+                  profile={comment.profile}
+                  isOp={comment.author === content.author}
+                />
+              ))}
+              <Box p="md" id="comment-form">
+                <Title order={4} mb="xs">
+                  <Text component="span" color="dimmed" mr={8}>
+                    <MessageCircle size={16} />
+                  </Text>
+                  Jump in
+                </Title>
+                <Textarea
+                  size="md"
+                  label="Reply"
+                  description="Don't be too nice, and make sure everything is in writing"
+                  minRows={4}
+                  value={commentContent}
+                  onChange={setCommentContent}
+                />
+                <Button mt="sm" loading={loading} onClick={handleCommentSubmit}>
+                  Submit
+                </Button>
+              </Box>
+            </Card>
+          </>
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <Card withBorder shadow="lg" mb="lg">
+            <Title order={4} mb="xs">
+              <Text component="span" color="dimmed" mr={8}>
+                <Speakerphone size={16} />
+              </Text>
+              Called out
+            </Title>
+            {taggedUsers.map((player) => (
+              <Link key={player.slug} href={`/player/${player.slug}`} passHref>
+                <Badge
+                  variant="outline"
+                  component="a"
+                  size="lg"
+                  color="indigo"
+                  mr="xs"
+                  sx={(theme) => ({
+                    cursor: 'pointer',
+                    '&:hover': {
+                      borderColor: theme.colors.gray[3],
+                    },
+                  })}
+                >
+                  {player.nickname}
+                </Badge>
+              </Link>
+            ))}
+            <Title order={4} mb="xs" mt="lg">
+              <Text component="span" color="dimmed" mr={8}>
+                <Tags size={16} />
+              </Text>
+              Tags
+            </Title>
+            {tags.map((tag) => (
+              <Link key={tag.slug} href={`/posts/tags/${tag.slug}`} passHref>
+                <Badge
+                  variant="dot"
+                  component="a"
+                  size="lg"
+                  color="green"
+                  mr="xs"
+                  sx={(theme) => ({
+                    cursor: 'pointer',
+                    '&:hover': {
+                      borderColor: theme.colors.green[8],
+                    },
+                  })}
+                >
+                  {tag.title}
+                </Badge>
+              </Link>
+            ))}
+          </Card>
+          <Card withBorder shadow="lg">
+            <Link href="/posts/new" passHref>
+              <Button
+                component="a"
+                variant="gradient"
+                gradient={{ from: 'pink', to: 'orange' }}
+                leftIcon={<FilePlus size={16} />}
+                fullWidth
+              >
+                New Post
+              </Button>
+            </Link>
+          </Card>
+        </Grid.Col>
+      </Grid>
     </Container>
   );
 }

@@ -18,20 +18,26 @@ import {
 } from 'lib/utils';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
-import { CurrencyDollar, FileUnknown, User } from 'tabler-icons-react';
-import { Content } from 'types/content';
+import {
+  Calendar,
+  CurrencyDollar,
+  FileUnknown,
+  MessageCircle,
+  User,
+} from 'tabler-icons-react';
+import { ContentWithComments } from 'types/content';
 import { FraudListWinnings, FraudPicks } from 'types/football';
 import { Profile } from 'types/user';
 
 type ProfileWithContentAndFraudData = Profile & {
-  content: Content[];
+  content: ContentWithComments[];
   fraudPicks: FraudPicks[];
   fraudListWinnings: FraudListWinnings[];
 };
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { data: profile } = await supabaseServerClient(ctx)
     .from<ProfileWithContentAndFraudData>('profile')
-    .select('*, content(*), fraudPicks(*), fraudListWinnings(*)')
+    .select('*, content(*, comments(id)), fraudPicks(*), fraudListWinnings(*)')
     .match({ slug: ctx.query.user })
     .single();
 
@@ -50,6 +56,8 @@ type ProfileProps = {
 
 export default function UserProfile({ profile }: ProfileProps) {
   const router = useRouter();
+
+  console.log(profile);
 
   const seasonsFraudListWinnings = profile.fraudListWinnings?.reduce(
     (acc, curr) => {
@@ -95,9 +103,24 @@ export default function UserProfile({ profile }: ProfileProps) {
                 })}
               >
                 <Text size="lg">{piece.markdownContent}</Text>
-                <Text size="sm" color="dimmed">
-                  {relativeTime.from(new Date(piece.createdAt))}
-                </Text>
+                <Group>
+                  <Group spacing={8} mt="sm">
+                    <Text color="dimmed" sx={{ lineHeight: 1 }}>
+                      <Calendar size={14} />
+                    </Text>
+                    <Text size="sm" color="dimmed">
+                      {relativeTime.from(new Date(piece.createdAt))}
+                    </Text>
+                  </Group>
+                  <Group spacing={8} mt="sm">
+                    <Text color="dimmed" sx={{ lineHeight: 1 }}>
+                      <MessageCircle size={14} />
+                    </Text>
+                    <Text size="sm" color="dimmed">
+                      {piece.comments.length}
+                    </Text>
+                  </Group>
+                </Group>
               </Card>
             ))
           ) : (
