@@ -4,7 +4,7 @@ import {
   supabaseServerClient,
   withPageAuth,
 } from '@supabase/auth-helpers-nextjs';
-import { currencyFormatter } from 'lib/utils';
+import { currencyFormatter, renderPageTitle } from 'lib/utils';
 import { FraudListWinnings } from 'types/football';
 import { Profile } from 'types/user';
 
@@ -49,7 +49,8 @@ export default function UserProfile({
   seasonsFraudListWinnings,
 }: ProfileProps) {
   return (
-    <Container>
+    <Container size="xl">
+      {renderPageTitle(`${profile.nickname} - Profile`)}
       <Text>your name is: {profile?.name}</Text>
       <Text>your team is: {profile?.teamName}</Text>
       <Text>you made {currencyFormatter.format(seasonsFraudListWinnings)}</Text>

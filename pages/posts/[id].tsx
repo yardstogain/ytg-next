@@ -11,6 +11,7 @@ import {
   supabaseServerClient,
   withPageAuth,
 } from '@supabase/auth-helpers-nextjs';
+import { renderPageTitle } from 'lib/utils';
 import Link from 'next/link';
 import { Comment, Content } from 'types/content';
 import { Profile } from 'types/user';
@@ -81,6 +82,7 @@ function SingleComment({
 export default function SinglePost({ content }: SinglePostProps) {
   return (
     <Container size="lg">
+      {renderPageTitle(`Post by ${content.profile.nickname}`)}
       {/* <code>{JSON.stringify(content)}</code> */}
       <ContentAuthor profile={content.profile} />
       <Text>{content.markdownContent}</Text>

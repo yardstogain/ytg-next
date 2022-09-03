@@ -6,6 +6,7 @@ import {
   Container,
   Group,
 } from '@mantine/core';
+import { renderPageTitle } from 'lib/utils';
 import { useRouter } from 'next/router';
 
 const useStyles = createStyles((theme) => ({
@@ -54,6 +55,7 @@ export default function NotFound() {
 
   return (
     <Container className={classes.root}>
+      {renderPageTitle('Woops! 404 Not Found')}
       <div className={classes.label}>404</div>
       <Title className={classes.title}>That's not a thing</Title>
       <Text

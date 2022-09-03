@@ -24,6 +24,7 @@ import {
   getTeamIcon,
   getFraudValueColor,
   teamLookup,
+  renderPageTitle,
 } from 'lib/utils';
 import { FileInfo, Trophy } from 'tabler-icons-react';
 import { schedule } from 'data/schedule2022';
@@ -179,6 +180,7 @@ FraudListHomeProps) {
 
   return (
     <Container size="lg">
+      {renderPageTitle('Fraud List')}
       <PageHeader
         title="Fraud List League"
         description={`Just you and your ${

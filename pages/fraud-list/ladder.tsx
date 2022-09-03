@@ -13,7 +13,12 @@ import {
   withPageAuth,
 } from '@supabase/auth-helpers-nextjs';
 import { PageHeader } from 'components';
-import { currencyFormatter, getLadderColor, getTeamIcon } from 'lib/utils';
+import {
+  currencyFormatter,
+  getLadderColor,
+  getTeamIcon,
+  renderPageTitle,
+} from 'lib/utils';
 import Link from 'next/link';
 import { Crown, Ladder, Trophy } from 'tabler-icons-react';
 import { FraudListWinnings, FraudPicks, TeamSlug } from 'types/football';
@@ -59,6 +64,7 @@ export default function LadderPage({ usersWithFraudData }: LadderPageProps) {
 
   return (
     <Container size="lg">
+      {renderPageTitle('Ladder - Fraud List')}
       <PageHeader
         title="Fraud Ladder"
         description="Consider this the social hierarchy of the world"

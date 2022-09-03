@@ -1,6 +1,7 @@
 import { MantineColor } from '@mantine/core';
 import { User } from '@supabase/supabase-js';
 import { stats2021 } from 'data/stats2021';
+import Head from 'next/head';
 import { Schedule, SimpleTeamData, TeamSlug } from 'types/football';
 import { Profile } from 'types/user';
 import { roles } from './constants';
@@ -221,3 +222,10 @@ export const getLadderColor = (rank: number): MantineColor => {
       return 'dimmed';
   }
 };
+
+export const renderPageTitle = (title: string) => (
+  <Head>
+    <title>{title} | The Pool</title>
+    <meta property="og:title" content={`${title} | The Pool`} key="title" />
+  </Head>
+);

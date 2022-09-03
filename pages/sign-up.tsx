@@ -28,7 +28,7 @@ import {
 } from 'tabler-icons-react';
 import { useRouter } from 'next/router';
 import { betaKeys } from 'data/betaKeys';
-import { validateEmail } from 'lib/utils';
+import { renderPageTitle, validateEmail } from 'lib/utils';
 import slugify from 'slugify';
 
 export default function SignUp() {
@@ -135,6 +135,7 @@ export default function SignUp() {
 
   return (
     <Container size="lg">
+      {renderPageTitle('Sign Up')}
       <PageHeader
         title="Sign Up"
         description="Welcome to the first day of the rest of your season"

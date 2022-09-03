@@ -20,6 +20,7 @@ import { Tag, Content } from 'types/content';
 import { useState } from 'react';
 import { useInputState } from '@mantine/hooks';
 import { useRouter } from 'next/router';
+import { renderPageTitle } from 'lib/utils';
 
 export const getServerSideProps = withPageAuth({
   redirectTo: '/login',
@@ -85,6 +86,7 @@ export default function NewPost({ user, users, tags }: NewPostProps) {
 
   return (
     <Container size="lg">
+      {renderPageTitle('New Post')}
       <PageHeader
         title="New Post"
         description="Fantasy sports isn't just about winning, you have to hurt people's feelings in the process"

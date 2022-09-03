@@ -1,6 +1,6 @@
 import { Container, Group, Title, Button } from '@mantine/core';
 import { PageHeader, TeamSelection } from 'components';
-import { csvToTeamsData, getCurrentWeek } from 'lib/utils';
+import { csvToTeamsData, getCurrentWeek, renderPageTitle } from 'lib/utils';
 import { stats2021 } from 'data/stats2021';
 import { schedule } from 'data/schedule2022';
 import {
@@ -52,6 +52,7 @@ export default function FraudListPicks({
   console.log('afp', activeFraudPicks);
   return (
     <Container size="lg">
+      {renderPageTitle('Picks - Fraud List')}
       <PageHeader
         title={`Fraud List Week ${weekData.week} Picks`}
         description="Pick three teams that you think will lose this week. The more you
