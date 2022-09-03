@@ -1,3 +1,4 @@
+import { MantineColor } from '@mantine/core';
 import { User } from '@supabase/supabase-js';
 import { stats2021 } from 'data/stats2021';
 import { Schedule, SimpleTeamData, TeamSlug } from 'types/football';
@@ -176,7 +177,7 @@ export const currencyFormatter = new Intl.NumberFormat('en-US', {
   currency: 'USD',
 });
 
-export const getFraudValueColor = (fraudValue: number): string => {
+export const getFraudValueColor = (fraudValue: number): MantineColor => {
   if (fraudValue > 15) return 'teal';
   if (fraudValue > 7.5) return 'lime';
   if (fraudValue < 0) return 'red';
@@ -206,4 +207,17 @@ export const calculateFraudListWinnings = (
     }
     return acc;
   }, 0);
+};
+
+export const getLadderColor = (rank: number): MantineColor => {
+  switch (rank) {
+    case 1:
+      return 'yellow';
+    case 2:
+      return 'gray.4';
+    case 3:
+      return 'orange.8';
+    default:
+      return 'dimmed';
+  }
 };

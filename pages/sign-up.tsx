@@ -215,7 +215,7 @@ export default function SignUp() {
         <TextInput
           size="md"
           label="Team Name"
-          description="Live your dream"
+          description="This will be your Fraud List team name"
           icon={<BallAmericanFootball />}
           value={teamName}
           onChange={setTeamName}
@@ -232,7 +232,7 @@ export default function SignUp() {
         <TextInput
           size="md"
           label="Nickname"
-          description="No spaces or special characters besides - and _, maximum 24 chars"
+          description="Your personal nickname, not a team name"
           icon={<User />}
           value={nickname}
           onChange={setNickname}

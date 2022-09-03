@@ -30,9 +30,9 @@ export const getServerSideProps = withPageAuth({
       .from<FraudPicksWithPartialProfile>('fraudPicks')
       .select('*, profile(teamName)')
       .match({ week: weekData.week, season: 2022, userId: user.id })
-      .limit(1);
+      .single();
 
-    return { props: { activeFraudPicks: data?.[0] || [] } };
+    return { props: { activeFraudPicks: data || [] } };
   },
 });
 

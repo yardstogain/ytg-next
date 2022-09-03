@@ -133,20 +133,20 @@ export default function SettingsHome({ user, profile }: SettingsProps) {
         />
         <TextInput
           size="md"
-          label="Nickname"
-          description="No spaces or special characters besides - and _, maximum 24 chars"
-          icon={<UserIcon />}
-          value={nickname}
-          onChange={setNickname}
-          error={nicknameError}
-        />
-        <TextInput
-          size="md"
           label="Team Name"
           description="Live your dream"
           icon={<BallAmericanFootball />}
           value={teamName}
           onChange={setTeamName}
+        />
+        <TextInput
+          size="md"
+          label="Nickname"
+          description="Your personal nickname, not a team name"
+          icon={<UserIcon />}
+          value={nickname}
+          onChange={setNickname}
+          error={nicknameError}
         />
       </Stack>
       <Card mt="xl" shadow="md" withBorder>
