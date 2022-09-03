@@ -146,7 +146,8 @@ export function Footer({ data }: FooterLinksProps) {
         <div className={classes.logo}>
           <LogoIcon />
           <Text size="xs" color="dimmed" className={classes.description}>
-            Build fully functional accessible web applications faster than ever
+            The only pool where you're encouraged to say what you're really
+            thinking
           </Text>
         </div>
         <div className={classes.groups}>{groups}</div>
@@ -154,7 +155,7 @@ export function Footer({ data }: FooterLinksProps) {
 
       <Container size="lg" className={classes.afterFooter}>
         <Text color="dimmed" size="sm">
-          © 2020 mantine.dev. All rights reserved.
+          © {new Date().getFullYear()} thepool.app. All rights reserved.
         </Text>
 
         <Group spacing={0} className={classes.social} position="right" noWrap>

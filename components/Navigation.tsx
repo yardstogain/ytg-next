@@ -5,8 +5,8 @@ import {
   Group,
   NavLink,
   Text,
-  Box,
   Skeleton,
+  Anchor,
 } from '@mantine/core';
 import {
   Settings,
@@ -34,16 +34,16 @@ const useStyles = createStyles((theme, _params, getRef) => {
   const icon = getRef('icon');
   return {
     header: {
-      padding: theme.spacing.sm,
-      paddingBottom: theme.spacing.xs,
-      background: theme.colors.dark[6],
-      borderRadius: theme.radius.md,
+      // padding: theme.spacing.sm,
+      paddingBottom: theme.spacing.sm,
+      // background: theme.colors.dark[6],
+      // borderRadius: theme.radius.md,
       marginBottom: theme.spacing.md,
-      // borderBottom: `1px solid ${
-      //   theme.colorScheme === 'dark'
-      //     ? theme.colors.dark[4]
-      //     : theme.colors.gray[2]
-      // }`,
+      borderBottom: `1px solid ${
+        theme.colorScheme === 'dark'
+          ? theme.colors.dark[4]
+          : theme.colors.gray[2]
+      }`,
     },
 
     footer: {
@@ -127,10 +127,11 @@ export function Navigation() {
       const { data } = await supabaseClient
         .from<Profile>('profile')
         .select('*')
-        .eq('id', user.id);
+        .match({ id: user.id })
+        .single();
 
       if (data) {
-        setProfile(data[0]);
+        setProfile(data);
       }
     }
     // Only run query once user is logged in.
@@ -151,9 +152,37 @@ export function Navigation() {
       <Navbar.Section grow>
         <Group className={classes.header}>
           <Link href="/" passHref>
-            <Box component="a" mx="auto" sx={{ width: 210 }}>
-              <LogoIcon.Full />
-            </Box>
+            <Anchor
+              color="teal"
+              underline={false}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <LogoIcon size={40} />
+              <Text
+                color="white"
+                weight="bold"
+                size={36}
+                transform="uppercase"
+                sx={{
+                  fontFamily: 'Righteous',
+                  marginLeft: 12,
+                  letterSpacing: -0.7,
+                }}
+              >
+                <Text
+                  component="span"
+                  color="dimmed"
+                  size="md"
+                  sx={{ verticalAlign: 'super' }}
+                >
+                  The
+                </Text>
+                Pool
+              </Text>
+            </Anchor>
           </Link>
         </Group>
         <Group spacing={0} mb="md">
@@ -267,7 +296,7 @@ export function Navigation() {
             <NavLink
               className={classes.link}
               component={NextLink}
-              href="/admin"
+              href="/admin/dashboard"
               icon={<LockAccess className={classes.linkIcon} />}
               label="Admin"
               active={router.pathname.includes('/admin')}
