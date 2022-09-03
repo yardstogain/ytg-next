@@ -20,7 +20,7 @@ import {
   User,
   withPageAuth,
 } from '@supabase/auth-helpers-nextjs';
-import { relativeTime, renderPageTitle } from 'lib/utils';
+import { getUserAvatar, relativeTime, renderPageTitle } from 'lib/utils';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -38,11 +38,11 @@ import { Comment, Content, Tag } from 'types/content';
 import { Profile } from 'types/user';
 
 type EnhancedComment = Comment & {
-  profile: Pick<Profile, 'nickname' | 'teamName' | 'slug'>;
+  profile: Pick<Profile, 'nickname' | 'teamName' | 'slug' | 'id'>;
 };
 
 type EnhancedContent = Content & {
-  profile: Pick<Profile, 'nickname' | 'teamName' | 'slug'>;
+  profile: Pick<Profile, 'nickname' | 'teamName' | 'slug' | 'id'>;
   comments: EnhancedComment[];
 };
 
@@ -54,8 +54,8 @@ export const getServerSideProps = withPageAuth({
       .select(
         `
         *, 
-        profile(nickname, teamName, slug), 
-        comments(*, profile(nickname, teamName, slug))
+        profile(id, nickname, teamName, slug), 
+        comments(*, profile(id, nickname, teamName, slug))
         `,
       )
       .match({ id: ctx.query.id })
@@ -89,7 +89,7 @@ type ContentAuthorProps = {
 function ContentAuthor({ profile, isOp }: ContentAuthorProps) {
   return (
     <Group spacing={0}>
-      <Avatar radius="xl" color="pink">
+      <Avatar radius="xl" color="pink" src={getUserAvatar(profile.id)}>
         <UserIcon />
       </Avatar>
       <Stack spacing={0} ml="xs">

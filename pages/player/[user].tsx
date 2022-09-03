@@ -13,6 +13,7 @@ import { PageHeader } from 'components';
 import {
   currencyFormatter,
   getTeamIcon,
+  getUserAvatar,
   relativeTime,
   renderPageTitle,
 } from 'lib/utils';
@@ -23,7 +24,7 @@ import {
   CurrencyDollar,
   FileUnknown,
   MessageCircle,
-  User,
+  // User,
 } from 'tabler-icons-react';
 import { ContentWithComments } from 'types/content';
 import { FraudListWinnings, FraudPicks } from 'types/football';
@@ -77,7 +78,7 @@ export default function UserProfile({ profile }: ProfileProps) {
       <PageHeader
         title={profile.nickname}
         description="Presenting their Sunday best... and everything else"
-        icon={<User size={48} />}
+        icon={<Avatar src={getUserAvatar(profile.id)} radius="xl" size={48} />}
         iconColor="violet"
       />
       <Grid mt="xl" gutter="xl">

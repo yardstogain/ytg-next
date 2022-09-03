@@ -109,7 +109,7 @@ export function arraysHaveSameItems(array1: string[], array2: string[]) {
 export function getUserAvatar(userId: string): string {
   const avatarBucket =
     'https://frvypfdkmdsottjcsvay.supabase.co/storage/v1/object/public/avatars';
-  return `${avatarBucket}/${userId}.jpeg`;
+  return `${avatarBucket}/${userId}.png`;
 }
 
 export function getTeamIcon(teamSlug: string): string {
