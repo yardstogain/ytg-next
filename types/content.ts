@@ -25,4 +25,9 @@ export type Comment = {
   updatedAt: string;
   author: User['id'];
   markdownContent: string;
+  contentId: string;
+};
+
+export type ContentWithComments = Content & {
+  comments: Comment[];
 };
