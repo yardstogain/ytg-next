@@ -75,7 +75,7 @@ export default function LadderPage({ usersWithFraudData }: LadderPageProps) {
         </thead>
         {sortedData.map((user, idx) => {
           // TODO: wont scale, season
-          const mostPicked: TeamSlug[] = user.fraudPicks.reduce((acc, curr) => {
+          const mostPicked = user.fraudPicks.reduce<TeamSlug[]>((acc, curr) => {
             if (curr.season === 2022) {
               return [...acc, ...curr.picks];
             }
