@@ -15,7 +15,7 @@ import {
 import { PageHeader } from 'components';
 import { currencyFormatter, getLadderColor, getTeamIcon } from 'lib/utils';
 import Link from 'next/link';
-import { Ladder, Trophy } from 'tabler-icons-react';
+import { Crown, Ladder, Trophy } from 'tabler-icons-react';
 import { FraudListWinnings, FraudPicks, TeamSlug } from 'types/football';
 import { Profile } from 'types/user';
 
@@ -61,11 +61,11 @@ export default function LadderPage({ usersWithFraudData }: LadderPageProps) {
     <Container size="lg">
       <PageHeader
         title="Fraud Ladder"
-        description="heyo"
+        description="Consider this the social hierarchy of the world"
         icon={<Ladder size={48} />}
         iconColor="indigo"
       />
-      <Table verticalSpacing="sm">
+      <Table verticalSpacing="sm" mt="xl">
         <thead>
           <tr>
             <th>Player</th>
@@ -94,16 +94,19 @@ export default function LadderPage({ usersWithFraudData }: LadderPageProps) {
             >
               <td>
                 <Group spacing={0}>
-                  <Text
-                    size={idx < 3 ? 40 : 24}
-                    weight="bold"
-                    color={getLadderColor(idx + 1)}
-                  >
-                    {idx < 3 && <Trophy size={24} />}
-                    {idx + 1}
-                  </Text>
-
-                  <Stack spacing={0} ml="lg" my="sm">
+                  <Box sx={{ width: idx < 3 ? 64 : 32 }}>
+                    <Text
+                      size={idx < 3 ? 40 : 24}
+                      weight="bold"
+                      color={getLadderColor(idx + 1)}
+                      align="right"
+                    >
+                      {idx === 0 && <Crown size={32} />}
+                      {idx < 3 && idx > 0 && <Trophy size={24} />}
+                      {idx + 1}
+                    </Text>
+                  </Box>
+                  <Stack spacing={0} ml="sm" my="sm">
                     <Text size="lg" weight={700}>
                       {user.teamName}
                     </Text>
