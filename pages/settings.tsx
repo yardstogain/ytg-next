@@ -123,52 +123,54 @@ export default function SettingsHome({ user, profile }: SettingsProps) {
         icon={<Settings size={48} />}
         iconColor="blue"
       />
-
-      <Stack spacing="md" mt="xl" pb="xl" sx={{ width: '50%' }}>
-        <TextInput
-          size="md"
-          label="Name"
-          description="Your real name, don't be a dick"
-          icon={<Pencil />}
-          value={name}
-          onChange={setName}
-        />
-        <TextInput
-          size="md"
-          label="Team Name"
-          description="Live your dream"
-          icon={<BallAmericanFootball />}
-          value={teamName}
-          onChange={setTeamName}
-        />
-        <TextInput
-          size="md"
-          label="Nickname"
-          description="Your personal nickname, not a team name"
-          icon={<UserIcon />}
-          value={nickname}
-          onChange={setNickname}
-          error={nicknameError}
-        />
-      </Stack>
-      <Card mt="xl" shadow="md" withBorder>
-        <Group spacing="sm">
-          <Button
-            onClick={handleSave}
-            loading={loading}
-            disabled={
-              name === profile.name &&
-              nickname === profile.nickname &&
-              teamName === profile.teamName
-            }
-          >
-            Save
-          </Button>
-          <Button onClick={reset} variant="subtle">
-            Reset
-          </Button>
-        </Group>
-      </Card>
+      <form onSubmit={handleSave}>
+        <Stack spacing="md" mt="xl" pb="xl" sx={{ width: '50%' }}>
+          <TextInput
+            size="md"
+            label="Name"
+            description="Your real name, don't be a dick"
+            icon={<Pencil />}
+            value={name}
+            onChange={setName}
+          />
+          <TextInput
+            size="md"
+            label="Team Name"
+            description="Live your dream"
+            icon={<BallAmericanFootball />}
+            value={teamName}
+            onChange={setTeamName}
+          />
+          <TextInput
+            size="md"
+            label="Nickname"
+            description="Your personal nickname, not a team name"
+            icon={<UserIcon />}
+            value={nickname}
+            onChange={setNickname}
+            error={nicknameError}
+          />
+        </Stack>
+        <Card mt="xl" shadow="md" withBorder>
+          <Group spacing="sm">
+            <Button
+              type="submit"
+              onClick={handleSave}
+              loading={loading}
+              disabled={
+                name === profile.name &&
+                nickname === profile.nickname &&
+                teamName === profile.teamName
+              }
+            >
+              Save
+            </Button>
+            <Button onClick={reset} variant="subtle">
+              Reset
+            </Button>
+          </Group>
+        </Card>
+      </form>
     </Container>
   );
 }

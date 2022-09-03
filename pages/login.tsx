@@ -81,25 +81,33 @@ export default function Login() {
             </Alert>
           </Card.Section>
         )}
-        <TextInput
-          label="Email"
-          placeholder="you@yardstogain.com"
-          value={email}
-          onChange={setEmail}
-          required
-        />
-        <PasswordInput
-          label="Password"
-          placeholder="Your password"
-          value={password}
-          onChange={setPassword}
-          required
-          mt="md"
-        />
+        <form onSubmit={handleLogin}>
+          <TextInput
+            label="Email"
+            placeholder="you@yardstogain.com"
+            value={email}
+            onChange={setEmail}
+            required
+          />
+          <PasswordInput
+            label="Password"
+            placeholder="Your password"
+            value={password}
+            onChange={setPassword}
+            required
+            mt="md"
+          />
 
-        <Button fullWidth mt="xl" onClick={handleLogin} loading={loading}>
-          Log in
-        </Button>
+          <Button
+            type="submit"
+            fullWidth
+            mt="xl"
+            onClick={handleLogin}
+            loading={loading}
+          >
+            Log in
+          </Button>
+        </form>
       </Card>
     </Container>
   );

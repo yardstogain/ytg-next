@@ -81,6 +81,7 @@ export default function UserProfile({ profile }: ProfileProps) {
             sortedContent.map((piece) => (
               <Card
                 withBorder
+                key={piece.id}
                 mb="lg"
                 onClick={() => {
                   router.push(`/posts/${piece.id}`);
