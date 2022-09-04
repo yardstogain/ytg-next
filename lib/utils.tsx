@@ -232,3 +232,16 @@ export const renderPageTitle = (title: string) => (
 );
 
 export const relativeTime = new RelativeTime();
+
+export const greet = (greetee: string): string => {
+  const greetings = ['Greetings', 'Howdy', 'Ayo'];
+
+  return `${
+    greetings[Math.floor(Math.random() * greetings.length)]
+  }, ${greetee}`;
+};
+
+export const getTotalWager = (picks: TeamSlug[]): number =>
+  picks.reduce((acc, curr) => {
+    return acc + teamLookup[curr].fraudValue;
+  }, 0);

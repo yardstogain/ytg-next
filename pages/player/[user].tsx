@@ -7,9 +7,10 @@ import {
   Text,
   Timeline,
   Title,
+  Stack,
 } from '@mantine/core';
 import { supabaseServerClient } from '@supabase/auth-helpers-nextjs';
-import { PageHeader } from 'components';
+import { RoleBadge } from 'components';
 import {
   currencyFormatter,
   getTeamIcon,
@@ -23,8 +24,8 @@ import {
   Calendar,
   CurrencyDollar,
   FileUnknown,
+  Ladder,
   MessageCircle,
-  // User,
 } from 'tabler-icons-react';
 import { ContentWithComments } from 'types/content';
 import { FraudListWinnings, FraudPicks } from 'types/football';
@@ -75,12 +76,25 @@ export default function UserProfile({ profile }: ProfileProps) {
   return (
     <Container size="xl">
       {renderPageTitle(`${profile.nickname} - Profile`)}
-      <PageHeader
-        title={profile.nickname}
-        description="Presenting their Sunday best... and everything else"
-        icon={<Avatar src={getUserAvatar(profile.id)} radius="xl" size={48} />}
-        iconColor="violet"
-      />
+      <Group spacing={0} mt="xl">
+        <Avatar src={getUserAvatar(profile.id)} mr="md" radius="xl" size={64} />
+        <Stack spacing={0}>
+          <Group spacing={0}>
+            <Text size={48} sx={{ fontFamily: 'Righteous' }}>
+              {profile.nickname}
+            </Text>
+          </Group>
+          <Group spacing="md">
+            <Group spacing={8}>
+              <Ladder size={16} />
+              <Text size="sm" color="dimmed">
+                {profile.teamName}
+              </Text>
+            </Group>
+            <RoleBadge role={profile.role} />
+          </Group>
+        </Stack>
+      </Group>
       <Grid mt="xl" gutter="xl">
         <Grid.Col span={8}>
           <Title order={3} mb="md">
