@@ -1,52 +1,216 @@
-import { Container, Text, List } from '@mantine/core';
+import {
+  Container,
+  Text,
+  Card,
+  Button,
+  Group,
+  Image,
+  Stack,
+  SimpleGrid,
+  Title,
+  Divider,
+  List,
+  ThemeIcon,
+} from '@mantine/core';
+import { useUser } from '@supabase/auth-helpers-react';
 import { renderPageTitle } from 'lib/utils';
+import Link from 'next/link';
+import {
+  Check,
+  EqualNot,
+  HandFinger,
+  ListCheck,
+  Pool,
+  Trophy,
+  UserPlus,
+} from 'tabler-icons-react';
+
+function LoggedOutHome() {
+  return (
+    <Stack>
+      <Card
+        mt={36}
+        p={36}
+        withBorder
+        sx={{ background: 'transparent' }}
+        shadow="xl"
+      >
+        <Group position="apart" noWrap>
+          <Stack spacing={0}>
+            <Text transform="uppercase" weight="bolder" color="dimmed">
+              Introducing{' '}
+              <Text inherit component="span">
+                Fraud List
+              </Text>
+            </Text>
+            <Text size={64} sx={{ fontFamily: 'Righteous', lineHeight: 1.25 }}>
+              Start getting credit for knowing who's a{' '}
+              <Text
+                inherit
+                component="span"
+                variant="gradient"
+                gradient={{ from: 'red', to: 'violet' }}
+              >
+                fraud
+              </Text>
+            </Text>
+            <Text size={24} mt="xl" color="dimmed">
+              Then you can stop telling your friends you "called it" and start
+              showing them your Fraud List
+            </Text>
+            <Group mt="xl">
+              <Link href="/sign-up" passHref>
+                <Button
+                  component="a"
+                  size="lg"
+                  variant="gradient"
+                  leftIcon={<UserPlus />}
+                  gradient={{ from: 'violet.9', to: 'violet.6' }}
+                >
+                  Sign up
+                </Button>
+              </Link>
+              <Link href="/fraud-list/about" passHref>
+                <Button component="a" size="lg" color="violet" variant="subtle">
+                  Learn more
+                </Button>
+              </Link>
+            </Group>
+          </Stack>
+          <Image src="/undraw-sports.svg" width={360} />
+        </Group>
+      </Card>
+      <SimpleGrid cols={3} mt="xl" spacing="xl">
+        <Group noWrap align="flex-start">
+          <Text color="indigo">
+            <Pool size={48} />
+          </Text>
+          <Stack spacing={0}>
+            <Title order={3}>Join the Pool</Title>
+            <Text color="dimmed">
+              Everyone plays in one league, and can jump in at any point during
+              the season.
+            </Text>
+          </Stack>
+        </Group>
+        <Group noWrap align="flex-start">
+          <Text color="indigo">
+            <ListCheck size={48} />
+          </Text>
+          <Stack spacing={0}>
+            <Title order={3}>Pick Frauds</Title>
+            <Text color="dimmed">
+              Choose losers. The better they are, the more you get for knowing
+              they're a fraud.
+            </Text>
+          </Stack>
+        </Group>
+        <Group noWrap align="flex-start">
+          <Text color="indigo">
+            <Trophy size={48} />
+          </Text>
+          <Stack spacing={0}>
+            <Title order={3}>Achieve Glory</Title>
+            <Text color="dimmed">
+              Once you've won, your competitors will know they were frauds this
+              whole time.
+            </Text>
+          </Stack>
+        </Group>
+      </SimpleGrid>
+      <Divider my="xl" id="learn-more" />
+      <SimpleGrid cols={2} spacing="xl">
+        <Stack spacing={0}>
+          <Text weight="bold" size={24}>
+            What's Different?
+          </Text>
+          <Text color="dimmed" mb="md">
+            There has to be a point to all of this right?
+          </Text>
+          <List
+            size="lg"
+            spacing="md"
+            icon={
+              <ThemeIcon color="cyan" radius="xl">
+                <EqualNot size={16} />
+              </ThemeIcon>
+            }
+          >
+            <List.Item>No spreads, just losers</List.Item>
+            <List.Item>No cop outs with a minimum wager</List.Item>
+            <List.Item>
+              Get in any time, you'll just miss previous weeks' earnings
+            </List.Item>
+            <List.Item>
+              Call your friends out with posts and comments, visible to everyone
+            </List.Item>
+            <List.Item>
+              Catch a hot streak and multiply your earnings every week
+            </List.Item>
+          </List>
+        </Stack>
+        <Stack spacing={0}>
+          <Text weight="bold" size={24}>
+            What's the Same?
+          </Text>
+          <Text color="dimmed" mb="md">
+            But not too different, Jesus...
+          </Text>
+          <List
+            size="lg"
+            spacing="md"
+            icon={
+              <ThemeIcon color="green" radius="xl">
+                <Check size={16} />
+              </ThemeIcon>
+            }
+          >
+            <List.Item>
+              Still don't have to watch anything besides Redzone
+            </List.Item>
+            <List.Item>When you're wrong it still feels bad</List.Item>
+            <List.Item>Which will be frequent</List.Item>
+            <List.Item>The website will break from time to time</List.Item>
+            <List.Item>Arguments over settings you don't control</List.Item>
+          </List>
+        </Stack>
+      </SimpleGrid>
+      <Card
+        mt={36}
+        p={36}
+        withBorder
+        sx={{ background: 'transparent', textAlign: 'center' }}
+        shadow="xl"
+      >
+        <Text
+          size={24}
+          mb="xl"
+          sx={{ fontFamily: 'Righteous', lineHeight: 1.25 }}
+        >
+          Enough foreplay...
+        </Text>
+        <Link href="/sign-up" passHref>
+          <Button
+            leftIcon={<HandFinger size={24} />}
+            component="a"
+            color="yellow"
+            size="xl"
+          >
+            Let's Go!
+          </Button>
+        </Link>
+      </Card>
+    </Stack>
+  );
+}
 
 export default function Index() {
+  const { user } = useUser();
+
   return (
     <Container size="xl">
       {renderPageTitle('Home')}
-      <Text>Todo</Text>
-      <List>
-        Fraud List
-        <List.Item>fix (or reload) data after first update</List.Item>
-        <List.Item>view previous picks</List.Item>
-        <List.Item>ladder page</List.Item>
-        <List.Item>think about how to arch the submission and stuff</List.Item>
-        User Management
-        <List.Item>invite a friend page</List.Item>
-        <List.Item>forgot password</List.Item>
-        Profile
-        <List.Item>Profile page</List.Item>
-        Content
-        <List.Item>users can create content</List.Item>
-        Home
-        <List.Item>simple home page</List.Item>
-        <List.Item>fill out footer</List.Item>
-        Admin
-        <List.Item>submit week results</List.Item>
-        Tech Debt
-        <List.Item>deploy the thing</List.Item>
-        <List.Item>clean up types</List.Item>
-        <List.Item>get radix colours in</List.Item>
-        <List.Item>tweak theme for fun</List.Item>
-        <List.Item>migrate to @tabler/react</List.Item>
-        <List.Item>migrate to a backend or graphql</List.Item>
-        prod readiness
-        <List.Item>analytics (plausible? splitbee?)</List.Item>
-        <hr></hr>maybe done
-        <hr></hr>done
-        <List.Item>favicon</List.Item>
-        <List.Item>edit settings</List.Item>
-        <List.Item>animation/feedback on submit/update</List.Item>
-        <List.Item>
-          setup week strategy, when week starts, when games start
-        </List.Item>
-        <List.Item>basic signup page</List.Item>
-        <List.Item>picks page</List.Item>
-        <List.Item>user roles</List.Item>
-        <List.Item>logout error?</List.Item>
-        <List.Item>already logged in on /login or /signup</List.Item>
-      </List>
+      {user ? 'ya logged' : <LoggedOutHome />}
     </Container>
   );
 }

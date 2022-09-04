@@ -87,6 +87,7 @@ export default function Login() {
             placeholder="you@yardstogain.com"
             value={email}
             onChange={setEmail}
+            size="md"
             required
           />
           <PasswordInput
@@ -94,6 +95,7 @@ export default function Login() {
             placeholder="Your password"
             value={password}
             onChange={setPassword}
+            size="md"
             required
             mt="md"
           />
