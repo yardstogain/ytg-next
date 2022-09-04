@@ -153,7 +153,7 @@ export function Navigation() {
         <Group className={classes.header}>
           <Link href="/" passHref>
             <Anchor
-              color="teal"
+              color="teal.4"
               underline={false}
               sx={{
                 display: 'flex',
@@ -166,6 +166,8 @@ export function Navigation() {
                 weight="bold"
                 size={36}
                 transform="uppercase"
+                variant="gradient"
+                gradient={{ from: 'white', to: 'gray.6' }}
                 sx={{
                   fontFamily: 'Righteous',
                   marginLeft: 12,
@@ -174,7 +176,6 @@ export function Navigation() {
               >
                 <Text
                   component="span"
-                  color="dimmed"
                   size="md"
                   sx={{ verticalAlign: 'super' }}
                 >
