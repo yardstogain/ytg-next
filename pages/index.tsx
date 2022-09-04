@@ -48,7 +48,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     .from<FraudPicks>('fraudPicks')
     .select('*')
     // TODO: season
-    .match({ week: currentWeek.week, season: 2022, userId: user.id })
+    .match({ week: currentWeek.week, season: 2022, userId: user?.id })
     .single();
 
   const { data: content } = await supabaseServerClient(ctx)
