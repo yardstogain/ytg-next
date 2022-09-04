@@ -24,7 +24,7 @@ const useStyles = createStyles((theme) => ({
   },
 
   logo: {
-    maxWidth: 200,
+    maxWidth: 240,
 
     [theme.fn.smallerThan('sm')]: {
       display: 'flex',
@@ -34,7 +34,7 @@ const useStyles = createStyles((theme) => ({
   },
 
   description: {
-    marginTop: 5,
+    marginTop: 4,
 
     [theme.fn.smallerThan('sm')]: {
       marginTop: theme.spacing.xs,

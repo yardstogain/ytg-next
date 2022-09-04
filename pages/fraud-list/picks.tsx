@@ -6,13 +6,12 @@ import { schedule } from 'data/schedule2022';
 import {
   getUser,
   supabaseServerClient,
-  // User,
   withPageAuth,
 } from '@supabase/auth-helpers-nextjs';
 import { ListCheck } from 'tabler-icons-react';
-import { useRouter } from 'next/router';
 import { Profile } from 'types/user';
 import { FraudPicks } from 'types/football';
+import Link from 'next/link';
 
 type FraudPicksWithPartialProfile = FraudPicks & {
   profile: {
@@ -46,11 +45,8 @@ export default function FraudListPicks({
   // user,
   activeFraudPicks,
 }: FraudListProps) {
-  const router = useRouter();
-
   const weekData = getCurrentWeek(schedule);
-  console.log('testing week: ', weekData.week);
-  console.log('afp', activeFraudPicks);
+
   return (
     <Container size="lg">
       {renderPageTitle('Picks - Fraud List')}
@@ -66,15 +62,11 @@ export default function FraudListPicks({
         <Group spacing="xs">
           <Title order={2}>My Picks</Title>
         </Group>
-        <Button
-          leftIcon={<ListCheck />}
-          variant="outline"
-          onClick={() => {
-            router.push(`/player/${activeFraudPicks.profile.slug}`);
-          }}
-        >
-          Previous Picks on Profile
-        </Button>
+        <Link href={`/player/${activeFraudPicks.profile.slug}`} passHref>
+          <Button component="a" leftIcon={<ListCheck />} variant="outline">
+            Previous Picks on Profile
+          </Button>
+        </Link>
       </Group>
       <TeamSelection
         teams={csvToTeamsData(stats2021)}

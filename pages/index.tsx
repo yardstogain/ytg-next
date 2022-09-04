@@ -1,216 +1,252 @@
 import {
   Container,
-  Text,
+  Stack,
+  Title,
+  Grid,
   Card,
   Button,
+  Badge,
+  Text,
   Group,
-  Image,
-  Stack,
-  SimpleGrid,
-  Title,
-  Divider,
-  List,
-  ThemeIcon,
+  Avatar,
 } from '@mantine/core';
-import { useUser } from '@supabase/auth-helpers-react';
-import { renderPageTitle } from 'lib/utils';
-import Link from 'next/link';
 import {
-  Check,
-  EqualNot,
-  HandFinger,
-  ListCheck,
-  Pool,
-  Trophy,
-  UserPlus,
-} from 'tabler-icons-react';
+  getUser,
+  supabaseServerClient,
+  User,
+} from '@supabase/auth-helpers-nextjs';
+import {
+  currencyFormatter,
+  getCurrentWeek,
+  getTeamIcon,
+  getTotalWager,
+  renderPageTitle,
+  teamLookup,
+} from 'lib/utils';
+import { GetServerSideProps } from 'next';
+import { LoggedOutHome, PostCard, ScoreStrip } from 'components';
+import { FullContent } from 'types/content';
+import { Profile } from 'types/user';
+import Link from 'next/link';
+import { CalendarStats, FilePlus, List, ListCheck } from 'tabler-icons-react';
+import { schedule } from 'data/schedule2022';
+import { FraudPicks } from 'types/football';
 
-function LoggedOutHome() {
-  return (
-    <Stack>
-      <Card
-        mt={36}
-        p={36}
-        withBorder
-        sx={{ background: 'transparent' }}
-        shadow="xl"
-      >
-        <Group position="apart" noWrap>
-          <Stack spacing={0}>
-            <Text transform="uppercase" weight="bolder" color="dimmed">
-              Introducing{' '}
-              <Text inherit component="span">
-                Fraud List
-              </Text>
-            </Text>
-            <Text size={64} sx={{ fontFamily: 'Righteous', lineHeight: 1.25 }}>
-              Start getting credit for knowing who's a{' '}
-              <Text
-                inherit
-                component="span"
-                variant="gradient"
-                gradient={{ from: 'red', to: 'violet' }}
-              >
-                fraud
-              </Text>
-            </Text>
-            <Text size={24} mt="xl" color="dimmed">
-              Then you can stop telling your friends you "called it" and start
-              showing them your Fraud List
-            </Text>
-            <Group mt="xl">
-              <Link href="/sign-up" passHref>
-                <Button
-                  component="a"
-                  size="lg"
-                  variant="gradient"
-                  leftIcon={<UserPlus />}
-                  gradient={{ from: 'violet.9', to: 'violet.6' }}
-                >
-                  Sign up
-                </Button>
-              </Link>
-              <Link href="/fraud-list/about" passHref>
-                <Button component="a" size="lg" color="violet" variant="subtle">
-                  Learn more
-                </Button>
-              </Link>
-            </Group>
-          </Stack>
-          <Image src="/undraw-sports.svg" width={360} />
-        </Group>
-      </Card>
-      <SimpleGrid cols={3} mt="xl" spacing="xl">
-        <Group noWrap align="flex-start">
-          <Text color="indigo">
-            <Pool size={48} />
-          </Text>
-          <Stack spacing={0}>
-            <Title order={3}>Join the Pool</Title>
-            <Text color="dimmed">
-              Everyone plays in one league, and can jump in at any point during
-              the season.
-            </Text>
-          </Stack>
-        </Group>
-        <Group noWrap align="flex-start">
-          <Text color="indigo">
-            <ListCheck size={48} />
-          </Text>
-          <Stack spacing={0}>
-            <Title order={3}>Pick Frauds</Title>
-            <Text color="dimmed">
-              Choose losers. The better they are, the more you get for knowing
-              they're a fraud.
-            </Text>
-          </Stack>
-        </Group>
-        <Group noWrap align="flex-start">
-          <Text color="indigo">
-            <Trophy size={48} />
-          </Text>
-          <Stack spacing={0}>
-            <Title order={3}>Achieve Glory</Title>
-            <Text color="dimmed">
-              Once you've won, your competitors will know they were frauds this
-              whole time.
-            </Text>
-          </Stack>
-        </Group>
-      </SimpleGrid>
-      <Divider my="xl" id="learn-more" />
-      <SimpleGrid cols={2} spacing="xl">
-        <Stack spacing={0}>
-          <Text weight="bold" size={24}>
-            What's Different?
-          </Text>
-          <Text color="dimmed" mb="md">
-            There has to be a point to all of this right?
-          </Text>
-          <List
-            size="lg"
-            spacing="md"
-            icon={
-              <ThemeIcon color="cyan" radius="xl">
-                <EqualNot size={16} />
-              </ThemeIcon>
-            }
-          >
-            <List.Item>No spreads, just losers</List.Item>
-            <List.Item>No cop outs with a minimum wager</List.Item>
-            <List.Item>
-              Get in any time, you'll just miss previous weeks' earnings
-            </List.Item>
-            <List.Item>
-              Call your friends out with posts and comments, visible to everyone
-            </List.Item>
-            <List.Item>
-              Catch a hot streak and multiply your earnings every week
-            </List.Item>
-          </List>
-        </Stack>
-        <Stack spacing={0}>
-          <Text weight="bold" size={24}>
-            What's the Same?
-          </Text>
-          <Text color="dimmed" mb="md">
-            But not too different, Jesus...
-          </Text>
-          <List
-            size="lg"
-            spacing="md"
-            icon={
-              <ThemeIcon color="green" radius="xl">
-                <Check size={16} />
-              </ThemeIcon>
-            }
-          >
-            <List.Item>
-              Still don't have to watch anything besides Redzone
-            </List.Item>
-            <List.Item>When you're wrong it still feels bad</List.Item>
-            <List.Item>Which will be frequent</List.Item>
-            <List.Item>The website will break from time to time</List.Item>
-            <List.Item>Arguments over settings you don't control</List.Item>
-          </List>
-        </Stack>
-      </SimpleGrid>
-      <Card
-        mt={36}
-        p={36}
-        withBorder
-        sx={{ background: 'transparent', textAlign: 'center' }}
-        shadow="xl"
-      >
-        <Text
-          size={24}
-          mb="xl"
-          sx={{ fontFamily: 'Righteous', lineHeight: 1.25 }}
-        >
-          Enough foreplay...
-        </Text>
-        <Link href="/sign-up" passHref>
-          <Button
-            leftIcon={<HandFinger size={24} />}
-            component="a"
-            color="yellow"
-            size="xl"
-          >
-            Let's Go!
-          </Button>
-        </Link>
-      </Card>
-    </Stack>
-  );
-}
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { user } = await getUser(ctx);
 
-export default function Index() {
-  const { user } = useUser();
+  const currentWeek = getCurrentWeek(schedule);
+  const now = new Date();
 
+  const { data: profile } = await supabaseServerClient(ctx)
+    .from<Profile>('profile')
+    .select('*')
+    .match({ id: user?.id })
+    .single();
+
+  const { data: activeFraudPicks } = await supabaseServerClient(ctx)
+    .from<FraudPicks>('fraudPicks')
+    .select('*')
+    // TODO: season
+    .match({ week: currentWeek.week, season: 2022, userId: user?.id })
+    .single();
+
+  const { data: content } = await supabaseServerClient(ctx)
+    .from<FullContent>('content')
+    .select('*, comments(id), profile(*)')
+    .order('createdAt', { ascending: false })
+    .limit(5);
+
+  const scoreStrip = await (
+    await fetch(
+      'http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard',
+    )
+  ).json();
+
+  return {
+    props: {
+      user,
+      profile,
+      activeFraudPicks,
+      content,
+      scoreStrip,
+      currentWeekNumber: currentWeek.week,
+      weekLocked: now >= currentWeek.startDate,
+    },
+  };
+};
+
+type IndexProps = {
+  user: User;
+  profile: Profile;
+  activeFraudPicks: FraudPicks;
+  content: FullContent[];
+  scoreStrip: any;
+  currentWeekNumber: number;
+  weekLocked: boolean;
+};
+
+export default function Index({
+  user,
+  activeFraudPicks,
+  content,
+  scoreStrip,
+  currentWeekNumber,
+  weekLocked,
+}: IndexProps) {
   return (
     <Container size="xl">
       {renderPageTitle('Home')}
-      {user ? 'ya logged' : <LoggedOutHome />}
+      {user ? (
+        <Stack spacing={0} mt="xl">
+          <Group position="apart">
+            <Group spacing="sm">
+              <Text component="span" color="yellow" sx={{ lineHeight: 1 }}>
+                <CalendarStats size={32} />
+              </Text>
+              <Title order={2} sx={{ fontFamily: 'Righteous', fontSize: 40 }}>
+                Week {currentWeekNumber}
+              </Title>
+            </Group>
+            <ScoreStrip data={scoreStrip} />
+          </Group>
+          <Grid mt="lg">
+            <Grid.Col span={6}>
+              <Group position="apart">
+                <Stack spacing={0} mb="md">
+                  <Title order={3}>This Week's Fraud List</Title>
+                  <Text color="dimmed" sx={{ lineHeight: 1 }}>
+                    {activeFraudPicks
+                      ? 'Always time to tweak those picks'
+                      : `Don't forget to pick your frauds`}
+                  </Text>
+                </Stack>
+                <Link href="/fraud-list/picks" passHref>
+                  <Button
+                    component="a"
+                    leftIcon={<ListCheck size={16} />}
+                    variant="subtle"
+                    color="gray"
+                  >
+                    Go to Picks
+                  </Button>
+                </Link>
+              </Group>
+              <Card withBorder shadow="lg">
+                {weekLocked && (
+                  <Badge color="red" variant="outline" mb="md">
+                    Week Locked
+                  </Badge>
+                )}
+
+                {activeFraudPicks ? (
+                  <>
+                    <Text size="lg" mb="md">
+                      This is what you're going with.
+                    </Text>
+                    <Stack
+                      spacing="xs"
+                      pb="sm"
+                      sx={(theme) => ({
+                        borderBottom: `1px solid ${theme.colors.gray[7]}`,
+                      })}
+                    >
+                      {activeFraudPicks.picks.map((pick) => {
+                        const team = teamLookup[pick];
+                        return (
+                          <Group key={pick}>
+                            <Avatar
+                              size={36}
+                              src={getTeamIcon(pick)}
+                              radius="xl"
+                            />
+                            <Text weight="bold">{team.name}</Text>
+                            <Text color="teal" weight="bold" ml="auto">
+                              {currencyFormatter.format(team.fraudValue)}
+                            </Text>
+                          </Group>
+                        );
+                      })}
+                    </Stack>
+                    <Group position="apart" mt="sm">
+                      <Text weight="bold" color="dimmed">
+                        Total Wager
+                      </Text>
+                      <Text color="teal" weight="bold">
+                        {currencyFormatter.format(
+                          getTotalWager(activeFraudPicks.picks),
+                        )}
+                      </Text>
+                    </Group>
+                  </>
+                ) : (
+                  <>
+                    <Text size="lg" mb="lg">
+                      The quickest path to a fat L is forgetting to submit your
+                      picks.
+                    </Text>
+                    <Link href="/fraud-list/picks" passHref>
+                      <Button
+                        component="a"
+                        size="lg"
+                        variant="gradient"
+                        gradient={{ from: 'cyan', to: 'violet' }}
+                        leftIcon={<ListCheck size={16} />}
+                        fullWidth
+                      >
+                        My Picks
+                      </Button>
+                    </Link>
+                  </>
+                )}
+              </Card>
+            </Grid.Col>
+
+            <Grid.Col span={6}>
+              <Group position="apart">
+                <Stack spacing={0} mb="md">
+                  <Title order={3}>Recent Posts</Title>
+                  <Text color="dimmed" sx={{ lineHeight: 1 }}>
+                    The musings of local singles near you
+                  </Text>
+                </Stack>
+                <Link href="/posts" passHref>
+                  <Button
+                    component="a"
+                    leftIcon={<List size={16} />}
+                    variant="subtle"
+                    color="gray"
+                  >
+                    View more
+                  </Button>
+                </Link>
+              </Group>
+              {content.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  calledOut={post.playerTags.includes(user?.id)}
+                />
+              ))}
+              <Card withBorder shadow="lg">
+                <Link href="/posts/new" passHref>
+                  <Button
+                    component="a"
+                    variant="gradient"
+                    gradient={{ from: 'pink', to: 'orange' }}
+                    leftIcon={<FilePlus size={16} />}
+                    fullWidth
+                  >
+                    New Post
+                  </Button>
+                </Link>
+              </Card>
+            </Grid.Col>
+          </Grid>
+        </Stack>
+      ) : (
+        <LoggedOutHome />
+      )}
     </Container>
   );
 }

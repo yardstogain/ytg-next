@@ -158,6 +158,10 @@ export function Navigation() {
               sx={{
                 display: 'flex',
                 alignItems: 'center',
+                transition: 'color ease 0.3s',
+                ':hover': {
+                  color: 'white',
+                },
               }}
             >
               <LogoIcon size={40} />

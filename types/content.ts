@@ -1,4 +1,5 @@
 import { User } from '@supabase/auth-helpers-nextjs';
+import { Profile } from './user';
 
 export type Tag = {
   slug: string;
@@ -30,4 +31,8 @@ export type Comment = {
 
 export type ContentWithComments = Content & {
   comments: Comment[];
+};
+
+export type FullContent = ContentWithComments & {
+  profile: Profile;
 };
