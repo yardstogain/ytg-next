@@ -26,23 +26,29 @@ export const getServerSideProps = withPageAuth({
     const { user } = await getUser(ctx);
     const weekData = getCurrentWeek(schedule);
 
-    const { data } = await supabaseServerClient(ctx)
+    const { data: activeFraudPicks } = await supabaseServerClient(ctx)
       .from<FraudPicksWithPartialProfile>('fraudPicks')
-      .select('*, profile(teamName, slug)')
+      .select('*')
       .match({ week: weekData.week, season: 2022, userId: user.id })
       .single();
 
-    return { props: { activeFraudPicks: data || [] } };
+    const { data: profile } = await supabaseServerClient(ctx)
+      .from<Profile>('profile')
+      .select('*')
+      .match({ id: user.id })
+      .single();
+
+    return { props: { profile, activeFraudPicks: activeFraudPicks || [] } };
   },
 });
 
 type FraudListProps = {
-  // user: User;
+  profile: Profile;
   activeFraudPicks: FraudPicksWithPartialProfile;
 };
 
 export default function FraudListPicks({
-  // user,
+  profile,
   activeFraudPicks,
 }: FraudListProps) {
   const weekData = getCurrentWeek(schedule);
@@ -62,7 +68,7 @@ export default function FraudListPicks({
         <Group spacing="xs">
           <Title order={2}>My Picks</Title>
         </Group>
-        <Link href={`/player/${activeFraudPicks.profile.slug}`} passHref>
+        <Link href={`/player/${profile.slug}`} passHref>
           <Button component="a" leftIcon={<ListCheck />} variant="outline">
             Previous Picks on Profile
           </Button>
