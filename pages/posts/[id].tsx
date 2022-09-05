@@ -20,14 +20,15 @@ import {
   User,
   withPageAuth,
 } from '@supabase/auth-helpers-nextjs';
+import { MarkdownContent } from 'components';
 import { getUserAvatar, relativeTime, renderPageTitle } from 'lib/utils';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import {
   ArrowDown,
+  ArrowLeft,
   Calendar,
-  FileArrowLeft,
   FilePlus,
   MessageCircle,
   Speakerphone,
@@ -138,9 +139,7 @@ function SingleComment({
       })}
     >
       <ContentAuthor profile={profile} isOp={isOp} />
-      <Text size="md" mt="sm">
-        {markdownContent}
-      </Text>
+      <MarkdownContent content={markdownContent} />
       <Group spacing={8} mt="sm">
         <Text color="dimmed" sx={{ lineHeight: 1 }}>
           <Calendar size={14} />
@@ -195,7 +194,12 @@ export default function SinglePost({
       {renderPageTitle(`Post by ${content.profile.nickname}`)}
       <Group position="apart" my="xl">
         <Link href="/posts" passHref>
-          <Button component="a" variant="outline" leftIcon={<FileArrowLeft />}>
+          <Button
+            component="a"
+            variant="subtle"
+            color="gray"
+            leftIcon={<ArrowLeft />}
+          >
             All Posts
           </Button>
         </Link>
@@ -203,9 +207,7 @@ export default function SinglePost({
       <Grid gutter="xl">
         <Grid.Col span={8}>
           <ContentAuthor profile={content.profile} />
-          <Text size="xl" mt="md">
-            {content.markdownContent}
-          </Text>
+          <MarkdownContent content={content.markdownContent} />
           <Group spacing={0} mt="sm">
             <Group spacing={8}>
               <Text color="dimmed" sx={{ lineHeight: 1 }}>
@@ -276,25 +278,35 @@ export default function SinglePost({
               </Text>
               Called out
             </Title>
-            {taggedUsers.map((player) => (
-              <Link key={player.slug} href={`/player/${player.slug}`} passHref>
-                <Badge
-                  variant="outline"
-                  component="a"
-                  size="lg"
-                  color="indigo"
-                  mr="xs"
-                  sx={(theme) => ({
-                    cursor: 'pointer',
-                    '&:hover': {
-                      borderColor: theme.colors.gray[3],
-                    },
-                  })}
+            {taggedUsers.length > 0 ? (
+              taggedUsers.map((player) => (
+                <Link
+                  key={player.slug}
+                  href={`/player/${player.slug}`}
+                  passHref
                 >
-                  {player.nickname}
-                </Badge>
-              </Link>
-            ))}
+                  <Badge
+                    variant="outline"
+                    component="a"
+                    size="lg"
+                    color="indigo"
+                    mr="xs"
+                    sx={(theme) => ({
+                      cursor: 'pointer',
+                      '&:hover': {
+                        borderColor: theme.colors.gray[3],
+                      },
+                    })}
+                  >
+                    {player.nickname}
+                  </Badge>
+                </Link>
+              ))
+            ) : (
+              <Badge color="gray" variant="filled">
+                No one
+              </Badge>
+            )}
             <Title order={4} mb="xs" mt="lg">
               <Text component="span" color="dimmed" mr={8}>
                 <Tags size={16} />

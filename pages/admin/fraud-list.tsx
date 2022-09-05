@@ -80,6 +80,10 @@ export default function AdminFraudList() {
       .from('fraudListResults')
       .upsert({ week: week, season: 2022, losers: selectedLosers });
 
+    if (upsertError) {
+      errorWhileUpdating = true;
+    }
+    // TODO: should not continue if errored
     // For each fraud pick, assign each picker's points
     const { data: fraudPicks } = await supabaseClient
       .from<FraudPicks>('fraudPicks')
@@ -102,15 +106,13 @@ export default function AdminFraudList() {
       });
     }
 
-    if (!upsertError && !errorWhileUpdating) {
+    if (!errorWhileUpdating) {
       showNotification({
         title: 'Results saved!',
         message: 'Good show old boy',
         color: 'teal',
         icon: <Check />,
       });
-    } else {
-      console.log(upsertError);
     }
 
     setLoading(false);

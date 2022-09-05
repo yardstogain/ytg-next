@@ -1,6 +1,6 @@
 import { AppProps } from 'next/app';
 import Head from 'next/head';
-import { Layout } from '../components';
+import { Layout, RouterTransition } from '../components';
 import { MantineProvider } from '@mantine/core';
 import { supabaseClient } from '@supabase/auth-helpers-nextjs';
 import { UserProvider } from '@supabase/auth-helpers-react';
@@ -28,6 +28,7 @@ export default function App({ Component, pageProps }: AppProps) {
         withGlobalStyles
       >
         <NotificationsProvider>
+          <RouterTransition />
           <Layout>
             <Component {...pageProps} />
           </Layout>

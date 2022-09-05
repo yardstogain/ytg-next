@@ -1,4 +1,5 @@
-import { Avatar, Badge, Card, Group, Stack, Text } from '@mantine/core';
+import { Avatar, Badge, Card, Group, Text } from '@mantine/core';
+import { MarkdownContent } from 'components';
 import { getUserAvatar, relativeTime } from 'lib/utils';
 import { useRouter } from 'next/router';
 import { Calendar, MessageCircle } from 'tabler-icons-react';
@@ -16,6 +17,7 @@ export function PostCard({ post, calledOut }: PostCardProps) {
       withBorder
       shadow="lg"
       mb="md"
+      pt={0}
       onClick={() => {
         router.push(`/posts/${post.id}`);
       }}
@@ -27,9 +29,7 @@ export function PostCard({ post, calledOut }: PostCardProps) {
         },
       })}
     >
-      <Stack>
-        <Text size="xl">{post.markdownContent}</Text>
-      </Stack>
+      <MarkdownContent content={post.markdownContent} />
       <Group mt="sm">
         <Group spacing={8}>
           <Text color="dimmed" sx={{ lineHeight: 1 }}>

@@ -10,7 +10,6 @@ import {
   Title,
   Stack,
   Anchor,
-  List,
 } from '@mantine/core';
 import {
   supabaseServerClient,
@@ -26,7 +25,7 @@ import {
   teamLookup,
   renderPageTitle,
 } from 'lib/utils';
-import { FileInfo, Trophy } from 'tabler-icons-react';
+import { BallAmericanFootball, Trophy } from 'tabler-icons-react';
 import { schedule } from 'data/schedule2022';
 import Link from 'next/link';
 import { Profile } from 'types/user';
@@ -44,13 +43,19 @@ export const getServerSideProps = withPageAuth({
     const { data } = await supabaseServerClient(ctx)
       .from<ProfileWithFraudPicks>('profile')
       .select(`id, name, nickname, teamName, slug, fraudPicks(*)`)
-      .match({ 'fraudPicks.week': weekData.week, 'fraudPicks.season': 2022 });
+      .match({
+        deleted: false,
+        'fraudPicks.week': weekData.week,
+        'fraudPicks.season': 2022,
+      });
+
+    const now = new Date();
 
     return {
       props: {
         profileWithFraudPicks: data,
         currentWeek: weekData.week,
-        weekStartDate: weekData.startDate.toISOString(),
+        weekLocked: now >= weekData.startDate,
       },
     };
   },
@@ -60,15 +65,15 @@ type FraudListHomeProps = {
   // user: User;
   profileWithFraudPicks: ProfileWithFraudPicks[];
   currentWeek: number;
-  // weekStartDate: string;
+  weekLocked: boolean;
 };
 
 export default function FraudListHome({
   // user,
   profileWithFraudPicks,
   currentWeek,
-}: // weekStartDate,
-FraudListHomeProps) {
+  weekLocked,
+}: FraudListHomeProps) {
   const totalWager = (picks: TeamSlug[]): string => {
     const wager = picks.reduce(
       (acc, curr) => acc + teamLookup[curr].fraudValue,
@@ -106,6 +111,55 @@ FraudListHomeProps) {
   const percent = (num: number, den: number) =>
     `${((num / den) * 100).toFixed(0)}%`;
 
+  const renderPicks = (picks: TeamSlug[], team: Profile) => {
+    if (weekLocked) {
+      if (picks?.length > 0) {
+        return picks.map((pick) => (
+          <Avatar
+            key={`${team.slug}-${pick}`}
+            size={48}
+            src={getTeamIcon(pick)}
+            radius="xl"
+            p={4}
+            ml={-8}
+            sx={(theme) => ({
+              borderWidth: 2,
+              borderColor:
+                theme.colors[getFraudValueColor(teamLookup[pick].fraudValue)],
+              borderStyle: 'solid',
+              background: theme.colors.dark[7],
+            })}
+          />
+        ));
+      } else {
+        return <Badge color="red">Missed Pick</Badge>;
+      }
+    } else {
+      if (picks?.length > 0) {
+        return picks.map((pick) => (
+          <Avatar
+            key={`${team.slug}-${pick}`}
+            size={48}
+            radius="xl"
+            p={4}
+            ml={-8}
+            sx={(theme) => ({
+              borderWidth: 2,
+              borderColor:
+                theme.colors[getFraudValueColor(teamLookup[pick].fraudValue)],
+              borderStyle: 'solid',
+              background: theme.colors.dark[7],
+            })}
+          >
+            <BallAmericanFootball />
+          </Avatar>
+        ));
+      } else {
+        return <Badge>Not Made</Badge>;
+      }
+    }
+  };
+
   const rows = profileWithFraudPicks.map((team) => (
     <Box component="tr" key={team.teamName}>
       <td>
@@ -126,29 +180,7 @@ FraudListHomeProps) {
       </td>
       <td>
         <Group spacing={0} position="left">
-          {team.fraudPicks.length > 0 ? (
-            team.fraudPicks[0].picks.map((pick) => (
-              <Avatar
-                key={pick}
-                size={48}
-                src={getTeamIcon(pick)}
-                radius="xl"
-                p={4}
-                ml={-8}
-                sx={(theme) => ({
-                  borderWidth: 2,
-                  borderColor:
-                    theme.colors[
-                      getFraudValueColor(teamLookup[pick].fraudValue)
-                    ],
-                  borderStyle: 'solid',
-                  background: theme.colors.dark[7],
-                })}
-              />
-            ))
-          ) : (
-            <Badge color="blue">Not made</Badge>
-          )}
+          {renderPicks(team.fraudPicks[0]?.picks, team)}
         </Group>
       </td>
       <td>
@@ -209,7 +241,7 @@ FraudListHomeProps) {
             <Stack spacing={0}>
               <Title order={4}>Most Picked Teams</Title>
               <Text color="dimmed" size="sm">
-                If you're into the road most travelled.
+                If you're into the road most traveled.
               </Text>
             </Stack>
             {/* TODO: this is very bad */}
@@ -227,17 +259,6 @@ FraudListHomeProps) {
                 No picks in yet
               </Badge>
             )}
-          </Card>
-          <Card withBorder mt="lg" shadow="md" sx={{ minWidth: 360 }}>
-            <Group spacing={4}>
-              <FileInfo />
-              <Title order={4}>Rules</Title>
-            </Group>
-            <List type="ordered" mt="md" size="md">
-              <List.Item>Pick teams to lose</List.Item>
-              <List.Item>Win what you wager</List.Item>
-              <List.Item>Get a bonus for being right</List.Item>
-            </List>
           </Card>
         </Stack>
       </Group>
