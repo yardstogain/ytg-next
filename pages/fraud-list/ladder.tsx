@@ -159,6 +159,11 @@ export default function LadderPage({ usersWithFraudData }: LadderPageProps) {
           );
         })}
       </Table>
+      {sortedData.length === 0 && (
+        <Text size="lg" mt="lg" color="dimmed" align="center">
+          Check back when week 1 is done!
+        </Text>
+      )}
     </Container>
   );
 }

@@ -115,7 +115,7 @@ export default function Index({
               <Group position="apart">
                 <Stack spacing={0} mb="md">
                   <Title order={3}>This Week's Fraud List</Title>
-                  <Text color="dimmed" sx={{ lineHeight: 1 }}>
+                  <Text color="dimmed" size="sm" sx={{ lineHeight: 1 }}>
                     {activeFraudPicks
                       ? 'Always time to tweak those picks'
                       : `Don't forget to pick your frauds`}
@@ -206,7 +206,7 @@ export default function Index({
               <Group position="apart">
                 <Stack spacing={0} mb="md">
                   <Title order={3}>Recent Posts</Title>
-                  <Text color="dimmed" sx={{ lineHeight: 1 }}>
+                  <Text color="dimmed" size="sm" sx={{ lineHeight: 1 }}>
                     The musings of local singles near you
                   </Text>
                 </Stack>

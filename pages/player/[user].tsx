@@ -10,7 +10,7 @@ import {
   Stack,
 } from '@mantine/core';
 import { supabaseServerClient } from '@supabase/auth-helpers-nextjs';
-import { RoleBadge } from 'components';
+import { MarkdownContent, RoleBadge } from 'components';
 import {
   currencyFormatter,
   getTeamIcon,
@@ -59,8 +59,6 @@ type ProfileProps = {
 export default function UserProfile({ profile }: ProfileProps) {
   const router = useRouter();
 
-  console.log(profile);
-
   const seasonsFraudListWinnings = profile.fraudListWinnings?.reduce(
     (acc, curr) => {
       return acc + curr.winnings;
@@ -106,6 +104,7 @@ export default function UserProfile({ profile }: ProfileProps) {
                 withBorder
                 key={piece.id}
                 mb="lg"
+                pt={0}
                 onClick={() => {
                   router.push(`/posts/${piece.id}`);
                 }}
@@ -117,7 +116,7 @@ export default function UserProfile({ profile }: ProfileProps) {
                   },
                 })}
               >
-                <Text size="lg">{piece.markdownContent}</Text>
+                <MarkdownContent content={piece.markdownContent} />
                 <Group>
                   <Group spacing={8} mt="sm">
                     <Text color="dimmed" sx={{ lineHeight: 1 }}>

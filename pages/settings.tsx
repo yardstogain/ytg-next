@@ -16,19 +16,21 @@ import {
   supabaseClient,
   supabaseServerClient,
   withPageAuth,
+  User,
 } from '@supabase/auth-helpers-nextjs';
 import { PageHeader } from 'components';
 import { getUserAvatar, renderPageTitle } from 'lib/utils';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import {
+  AlertCircle,
   BallAmericanFootball,
   Check,
   Pencil,
   Settings,
   User as UserIcon,
 } from 'tabler-icons-react';
-import { User, Profile } from 'types/user';
+import { Profile } from 'types/user';
 
 export const getServerSideProps = withPageAuth({
   redirectTo: '/login',
@@ -38,10 +40,10 @@ export const getServerSideProps = withPageAuth({
     const { data } = await supabaseServerClient(ctx)
       .from<Profile>('profile')
       .select('*')
-      .eq('id', user.id)
-      .limit(1);
+      .match({ id: user.id })
+      .single();
 
-    return { props: { profile: data?.[0] } };
+    return { props: { profile: data } };
   },
 });
 
@@ -104,16 +106,19 @@ export default function SettingsHome({ user, profile }: SettingsProps) {
         .match({ id: user.id });
 
       if (avatarFile) {
-        const { data, error: avatarError } = await supabaseClient.storage
+        const { error: avatarError } = await supabaseClient.storage
           .from('avatars')
           .upload(`${user.id}.png`, avatarFile, {
             upsert: true,
           });
 
-        console.log('ad', data);
-
         if (avatarError) {
-          console.log('Error uploading avatar', avatarError);
+          showNotification({
+            title: 'Avatar upload failed',
+            message: avatarError.message,
+            color: 'red',
+            icon: <AlertCircle />,
+          });
         }
       }
 
@@ -126,15 +131,11 @@ export default function SettingsHome({ user, profile }: SettingsProps) {
         });
         // Refresh SSR data
         router.replace(router.asPath);
-      } else {
-        console.log('Woopsie', profileError);
       }
     }
     reset();
     setLoading(false);
   };
-
-  console.log('af', avatarFile);
 
   return (
     <Container size="lg">

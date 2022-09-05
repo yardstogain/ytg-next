@@ -30,6 +30,7 @@ import { useRouter } from 'next/router';
 import { betaKeys } from 'data/betaKeys';
 import { renderPageTitle, validateEmail } from 'lib/utils';
 import slugify from 'slugify';
+import { showNotification } from '@mantine/notifications';
 
 export default function SignUp() {
   const { user } = useUser();
@@ -132,7 +133,12 @@ export default function SignUp() {
           .match({ id: user.id });
 
         if (profileError) {
-          console.log('There was an error updating profile', profileError);
+          showNotification({
+            title: 'Error setting profile',
+            message: profileError.message,
+            color: 'red',
+            icon: <AlertCircle />,
+          });
         }
       }
     }

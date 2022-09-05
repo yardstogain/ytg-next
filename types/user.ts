@@ -1,7 +1,3 @@
-import { User } from '@supabase/auth-helpers-nextjs';
-
-export type { User };
-
 export type Profile = {
   id: string;
   createdAt: string;
@@ -11,4 +7,5 @@ export type Profile = {
   teamName: string;
   role: number;
   slug: string;
+  deleted: boolean;
 };

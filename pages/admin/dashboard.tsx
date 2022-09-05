@@ -60,7 +60,6 @@ export default function AdminHome({
   numPosts,
   numComments,
 }: AdminHomeProps) {
-  console.log('p', numPosts);
   return (
     <Container size="lg">
       {renderPageTitle('Dashboard - Admin')}

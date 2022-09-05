@@ -8,6 +8,7 @@ import {
   Textarea,
 } from '@mantine/core';
 import {
+  getUser,
   supabaseClient,
   supabaseServerClient,
   User,
@@ -26,9 +27,13 @@ export const getServerSideProps = withPageAuth({
   redirectTo: '/login',
   // TODO: how to parallel in this case
   async getServerSideProps(ctx) {
+    const { user } = await getUser(ctx);
+
     const { data: users } = await supabaseServerClient(ctx)
       .from<Profile>('profile')
-      .select('id, nickname');
+      .select('id, nickname')
+      .eq('deleted', false)
+      .neq('id', user.id);
 
     const { data: tags } = await supabaseServerClient(ctx)
       .from<Tag>('tags')
@@ -71,6 +76,9 @@ export default function NewPost({ user, users, tags }: NewPostProps) {
   };
 
   const validate = () => {
+    if (selectedTags.length === 0) {
+      return false;
+    }
     return true;
   };
 
@@ -123,6 +131,7 @@ export default function NewPost({ user, users, tags }: NewPostProps) {
           clearButtonLabel="Clear selection"
           value={selectedTags}
           onChange={setSelectedTags}
+          required
           clearable
           searchable
         />
