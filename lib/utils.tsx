@@ -226,7 +226,7 @@ export const getLadderColor = (rank: number): MantineColor => {
 
 export const renderPageTitle = (title: string) => (
   <Head>
-    <title>{title} | The Pool</title>
+    <title>{`${title} | The Pool`}</title>
     <meta property="og:title" content={`${title} | The Pool`} key="title" />
   </Head>
 );
