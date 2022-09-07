@@ -10,7 +10,6 @@ import {
   Group,
   Avatar,
   Loader,
-  Box,
 } from '@mantine/core';
 import {
   getUser,
