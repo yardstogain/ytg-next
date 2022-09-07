@@ -32,7 +32,6 @@ export const getServerSideProps = withPageAuth({
     const { data: users } = await supabaseServerClient(ctx)
       .from<Profile>('profile')
       .select('id, nickname')
-      .eq('deleted', false)
       .neq('id', user.id);
 
     const { data: tags } = await supabaseServerClient(ctx)
@@ -66,10 +65,11 @@ export default function NewPost({ user, users, tags }: NewPostProps) {
         .from<Content>('content')
         .insert([
           { author: user.id, markdownContent, playerTags, tags: selectedTags },
-        ]);
+        ])
+        .single();
 
       if (data) {
-        router.replace(`/posts/${data[0].id}`);
+        router.replace(`/posts/${data.id}`);
       }
     }
     setLoading(false);
@@ -82,15 +82,19 @@ export default function NewPost({ user, users, tags }: NewPostProps) {
     return true;
   };
 
-  const userList = users.map((user) => ({
-    value: user.id,
-    label: user.nickname,
-  }));
+  const userList = users
+    .map((user) => ({
+      value: user.id,
+      label: user.nickname,
+    }))
+    .filter((x) => x.label != null);
 
-  const tagList = tags.map((tag) => ({
-    value: tag.slug,
-    label: tag.title,
-  }));
+  const tagList = tags
+    .map((tag) => ({
+      value: tag.slug,
+      label: tag.title,
+    }))
+    .filter((x) => x.label != null);
 
   return (
     <Container size="lg">

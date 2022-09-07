@@ -11,11 +11,11 @@ import { useState, useEffect } from 'react';
 import { supabaseClient } from '@supabase/auth-helpers-nextjs';
 import { useUser } from '@supabase/auth-helpers-react';
 import { PageHeader } from 'components';
-import { AlertCircle, Logout } from 'tabler-icons-react';
+import { AlertCircle, Login, Wand } from 'tabler-icons-react';
 import { useRouter } from 'next/router';
 import { renderPageTitle } from 'lib/utils';
 
-export default function Login() {
+export default function LoginPage() {
   const { user } = useUser();
   const router = useRouter();
   const [email, setEmail] = useInputState('');
@@ -55,7 +55,7 @@ export default function Login() {
       <PageHeader
         title="Log in"
         description="To play games, acquire bragging rights, and ruin your next family dinner, you'll need to log in."
-        icon={<Logout size={48} />}
+        icon={<Login size={48} />}
         iconColor="yellow"
       />
 
@@ -81,10 +81,19 @@ export default function Login() {
             </Alert>
           </Card.Section>
         )}
+        <Alert
+          icon={<Wand size={16} />}
+          title="No Password Required!"
+          color="blue"
+          mb="md"
+        >
+          Leave the password field blank and you'll get an email with a link to
+          log you in
+        </Alert>
         <form onSubmit={handleLogin}>
           <TextInput
             label="Email"
-            placeholder="you@yardstogain.com"
+            placeholder="you@thepool.app"
             value={email}
             onChange={setEmail}
             size="md"
@@ -104,6 +113,7 @@ export default function Login() {
             type="submit"
             fullWidth
             mt="xl"
+            size="md"
             onClick={handleLogin}
             loading={loading}
           >

@@ -176,9 +176,8 @@ export default function SignUp() {
         <Card withBorder shadow="md" mt="xl" sx={{ background: 'transparent' }}>
           <Title order={4}>Beta Key</Title>
           <Text color="dimmed">
-            Yards to Gain is currently in private beta, so you'll need a key to
-            sign up. If you don't know where to get one, you're probably not
-            invited.
+            The Pool is currently in private beta, so you'll need a key to sign
+            up. If you don't know where to get one, you're probably not invited.
           </Text>
           <Stack spacing={0} sx={{ width: '50%' }}>
             <TextInput
