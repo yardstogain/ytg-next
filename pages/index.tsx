@@ -13,8 +13,8 @@ import {
 } from '@mantine/core';
 import {
   getUser,
-  supabaseClient,
   supabaseServerClient,
+  User,
 } from '@supabase/auth-helpers-nextjs';
 import {
   currencyFormatter,
@@ -34,6 +34,7 @@ import { schedule } from 'data/schedule2022';
 import { FraudPicks } from 'types/football';
 import { useUser } from '@supabase/auth-helpers-react';
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { user } = await getUser(ctx);
@@ -80,7 +81,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 };
 
 type IndexProps = {
-  // user: User;
+  user?: User;
   profile: Profile;
   activeFraudPicks: FraudPicks;
   content: FullContent[];
@@ -250,11 +251,20 @@ export default function Index({
   scoreStrip,
   currentWeekNumber,
   weekLocked,
+  user,
 }: IndexProps) {
   const router = useRouter();
-  const { isLoading } = useUser();
+  const { user: clientUser, isLoading } = useUser();
 
-  if (!profile && isLoading) {
+  useEffect(() => {
+    console.log('in UE');
+    if (clientUser && !isLoading && !user) {
+      console.log('in cond', clientUser, user);
+      router.replace(router.asPath);
+    }
+  }, [user, isLoading]);
+
+  if (isLoading) {
     return (
       <Stack align="center" justify="center" sx={{ height: '70vh' }}>
         <Loader size={100} />
@@ -262,18 +272,10 @@ export default function Index({
     );
   }
 
-  supabaseClient.auth.onAuthStateChange((event, session) => {
-    console.log('index triggered onAuthStateChange', event);
-    console.log('session info', session);
-    if (event === 'SIGNED_IN' && session) {
-      router.replace(router.asPath);
-    }
-  });
-
   return (
     <>
       {renderPageTitle('Home')}
-      {profile ? (
+      {user ? (
         <Container size="lg">
           <LoggedInHome
             profile={profile}
