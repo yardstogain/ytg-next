@@ -24,7 +24,7 @@ import { useRouter } from 'next/router';
 import { renderPageTitle } from 'lib/utils';
 
 export const getServerSideProps = withPageAuth({
-  redirectTo: '/login',
+  redirectTo: '/login?f=ar',
   // TODO: how to parallel in this case
   async getServerSideProps(ctx) {
     const { user } = await getUser(ctx);

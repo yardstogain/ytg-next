@@ -7,56 +7,39 @@ import {
   Stack,
   Button,
 } from '@mantine/core';
-import {
-  supabaseServerClient,
-  withPageAuth,
-} from '@supabase/auth-helpers-nextjs';
+import { supabaseServerClient } from '@supabase/auth-helpers-nextjs';
 import { PageHeader, PostCard } from 'components';
 import { renderPageTitle } from 'lib/utils';
 import { FullContent, Tag } from 'types/content';
 import { FilePlus, Tag as TagIcon } from 'tabler-icons-react';
 import { NextLink } from '@mantine/next';
+import { GetServerSideProps } from 'next';
 
-export const getServerSideProps = withPageAuth({
-  redirectTo: '/login',
-  async getServerSideProps(ctx) {
-    //   const { data: content } = await supabaseServerClient(ctx)
-    //     .from<EnhancedContent>('content')
-    //     .select(
-    //       `
-    //       *,
-    //       profile(id, nickname, teamName, slug),
-    //       comments(*, profile(id, nickname, teamName, slug))
-    //       `,
-    //     )
-    //     .match({ id: ctx.query.id })
-    //     .single();
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { data: tag } = await supabaseServerClient(ctx)
+    .from<Tag>('tags')
+    .select('*')
+    .match({ slug: ctx.query.slug })
+    .single();
 
-    const { data: tag } = await supabaseServerClient(ctx)
-      .from<Tag>('tags')
-      .select('*')
-      .match({ slug: ctx.query.slug })
-      .single();
+  if (!tag) {
+    return {
+      notFound: true,
+    };
+  }
 
-    if (!tag) {
-      return {
-        notFound: true,
-      };
-    }
+  const { data: allTags } = await supabaseServerClient(ctx)
+    .from<Tag>('tags')
+    .select('*');
 
-    const { data: allTags } = await supabaseServerClient(ctx)
-      .from<Tag>('tags')
-      .select('*');
+  const { data: content } = await supabaseServerClient(ctx)
+    .from<FullContent>('content')
+    .select('*, comments(id), profile(*)')
+    .contains('tags', [tag.slug])
+    .order('createdAt', { ascending: false });
 
-    const { data: content } = await supabaseServerClient(ctx)
-      .from<FullContent>('content')
-      .select('*, comments(id), profile(*)')
-      .contains('tags', [tag.slug])
-      .order('createdAt', { ascending: false });
-
-    return { props: { tag, allTags, content } };
-  },
-});
+  return { props: { tag, allTags, content } };
+};
 
 type TagListPageProps = {
   tag: Tag;
