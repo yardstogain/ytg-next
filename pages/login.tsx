@@ -100,7 +100,7 @@ export default function LoginPage() {
             <Anchor component={NextLink} href="/sign-up">
               Sign up
             </Anchor>{' '}
-            today to get start!
+            today to get started!
           </Alert>
         )}
         {checkEmail ? (
