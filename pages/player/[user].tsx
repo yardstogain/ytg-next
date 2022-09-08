@@ -9,10 +9,12 @@ import {
   Title,
   Stack,
 } from '@mantine/core';
-import { supabaseServerClient } from '@supabase/auth-helpers-nextjs';
+import { getUser, supabaseServerClient } from '@supabase/auth-helpers-nextjs';
 import { MarkdownContent, RoleBadge } from 'components';
+import { schedule } from 'data/schedule2022';
 import {
   currencyFormatter,
+  getCurrentWeek,
   getTeamIcon,
   getUserAvatar,
   relativeTime,
@@ -21,6 +23,7 @@ import {
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import {
+  BallAmericanFootball,
   Calendar,
   CurrencyDollar,
   FileUnknown,
@@ -37,6 +40,8 @@ type ProfileWithContentAndFraudData = Profile & {
   fraudListWinnings: FraudListWinnings[];
 };
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { user } = await getUser(ctx);
+
   const { data: profile } = await supabaseServerClient(ctx)
     .from<ProfileWithContentAndFraudData>('profile')
     .select('*, content(*, comments(id)), fraudPicks(*), fraudListWinnings(*)')
@@ -49,14 +54,25 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
-  return { props: { profile } };
+  const now = new Date();
+  const weekLocked = now >= getCurrentWeek(schedule).startDate;
+
+  const viewingOwnProfile = user.id === profile.id;
+
+  return { props: { profile, weekLocked, viewingOwnProfile } };
 };
 
 type ProfileProps = {
   profile: ProfileWithContentAndFraudData;
+  weekLocked: boolean;
+  viewingOwnProfile: boolean;
 };
 
-export default function UserProfile({ profile }: ProfileProps) {
+export default function UserProfile({
+  profile,
+  weekLocked,
+  viewingOwnProfile,
+}: ProfileProps) {
   const router = useRouter();
 
   const seasonsFraudListWinnings = profile.fraudListWinnings?.reduce(
@@ -169,7 +185,11 @@ export default function UserProfile({ profile }: ProfileProps) {
                       <Avatar
                         key={team}
                         size={64}
-                        src={getTeamIcon(team)}
+                        src={
+                          weekLocked || viewingOwnProfile
+                            ? getTeamIcon(team)
+                            : null
+                        }
                         radius="xl"
                         p={4}
                         mr="xs"
@@ -179,7 +199,9 @@ export default function UserProfile({ profile }: ProfileProps) {
                           borderStyle: 'solid',
                           background: theme.colors.dark[7],
                         })}
-                      />
+                      >
+                        <BallAmericanFootball size={36} />
+                      </Avatar>
                     ))}
                   </Group>
                   <Text weight="bold" color="dimmed">
