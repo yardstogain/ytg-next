@@ -260,20 +260,24 @@ export default function Index({
   }
 
   return (
-    <Container size="lg">
+    <>
       {renderPageTitle('Home')}
       {user ? (
-        <LoggedInHome
-          user={user}
-          activeFraudPicks={activeFraudPicks}
-          content={content}
-          scoreStrip={scoreStrip}
-          currentWeekNumber={currentWeekNumber}
-          weekLocked={weekLocked}
-        />
+        <Container size="lg">
+          <LoggedInHome
+            user={user}
+            activeFraudPicks={activeFraudPicks}
+            content={content}
+            scoreStrip={scoreStrip}
+            currentWeekNumber={currentWeekNumber}
+            weekLocked={weekLocked}
+          />
+        </Container>
       ) : (
-        <LoggedOutHome />
+        <Container size="xl">
+          <LoggedOutHome />
+        </Container>
       )}
-    </Container>
+    </>
   );
 }
