@@ -13,8 +13,8 @@ import {
 } from '@mantine/core';
 import {
   getUser,
+  supabaseClient,
   supabaseServerClient,
-  User,
 } from '@supabase/auth-helpers-nextjs';
 import {
   currencyFormatter,
@@ -33,6 +33,7 @@ import { CalendarStats, FilePlus, List, ListCheck } from 'tabler-icons-react';
 import { schedule } from 'data/schedule2022';
 import { FraudPicks } from 'types/football';
 import { useUser } from '@supabase/auth-helpers-react';
+import { useRouter } from 'next/router';
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { user } = await getUser(ctx);
@@ -79,8 +80,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 };
 
 type IndexProps = {
-  user: User;
-  // profile: Profile;
+  // user: User;
+  profile: Profile;
   activeFraudPicks: FraudPicks;
   content: FullContent[];
   scoreStrip: any;
@@ -89,7 +90,7 @@ type IndexProps = {
 };
 
 export function LoggedInHome({
-  user,
+  profile,
   activeFraudPicks,
   content,
   scoreStrip,
@@ -220,7 +221,7 @@ export function LoggedInHome({
             <PostCard
               key={post.id}
               post={post}
-              calledOut={post.playerTags.includes(user?.id)}
+              calledOut={post.playerTags.includes(profile.id)}
             />
           ))}
           <Card withBorder shadow="lg">
@@ -243,15 +244,17 @@ export function LoggedInHome({
 }
 
 export default function Index({
+  profile,
   activeFraudPicks,
   content,
   scoreStrip,
   currentWeekNumber,
   weekLocked,
 }: IndexProps) {
-  const { user, isLoading } = useUser();
+  const router = useRouter();
+  const { isLoading } = useUser();
 
-  if (isLoading) {
+  if (!profile && isLoading) {
     return (
       <Stack align="center" justify="center" sx={{ height: '70vh' }}>
         <Loader size={100} />
@@ -259,13 +262,21 @@ export default function Index({
     );
   }
 
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    console.log('index triggered onAuthStateChange', event);
+    console.log('session info', session);
+    if (event === 'SIGNED_IN' && session) {
+      router.replace(router.asPath);
+    }
+  });
+
   return (
     <>
       {renderPageTitle('Home')}
-      {user ? (
+      {profile ? (
         <Container size="lg">
           <LoggedInHome
-            user={user}
+            profile={profile}
             activeFraudPicks={activeFraudPicks}
             content={content}
             scoreStrip={scoreStrip}

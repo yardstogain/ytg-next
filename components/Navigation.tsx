@@ -293,7 +293,7 @@ export function Navigation() {
           component={NextLink}
           href="/posts"
           icon={<Files className={classes.linkIcon} />}
-          label="All Posts"
+          label="Recent Posts"
           active={router.pathname === '/posts'}
         />
         <NavLink
