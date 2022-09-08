@@ -11,8 +11,10 @@ import {
 } from '@mantine/core';
 import { supabaseServerClient } from '@supabase/auth-helpers-nextjs';
 import { MarkdownContent, RoleBadge } from 'components';
+import { schedule } from 'data/schedule2022';
 import {
   currencyFormatter,
+  getCurrentWeek,
   getTeamIcon,
   getUserAvatar,
   relativeTime,
@@ -21,6 +23,7 @@ import {
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import {
+  BallAmericanFootball,
   Calendar,
   CurrencyDollar,
   FileUnknown,
@@ -49,14 +52,18 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
-  return { props: { profile } };
+  const now = new Date();
+  const weekLocked = now >= getCurrentWeek(schedule).startDate;
+
+  return { props: { profile, weekLocked } };
 };
 
 type ProfileProps = {
   profile: ProfileWithContentAndFraudData;
+  weekLocked: boolean;
 };
 
-export default function UserProfile({ profile }: ProfileProps) {
+export default function UserProfile({ profile, weekLocked }: ProfileProps) {
   const router = useRouter();
 
   const seasonsFraudListWinnings = profile.fraudListWinnings?.reduce(
@@ -169,7 +176,7 @@ export default function UserProfile({ profile }: ProfileProps) {
                       <Avatar
                         key={team}
                         size={64}
-                        src={getTeamIcon(team)}
+                        src={weekLocked ? getTeamIcon(team) : null}
                         radius="xl"
                         p={4}
                         mr="xs"
@@ -179,7 +186,9 @@ export default function UserProfile({ profile }: ProfileProps) {
                           borderStyle: 'solid',
                           background: theme.colors.dark[7],
                         })}
-                      />
+                      >
+                        <BallAmericanFootball size={36} />
+                      </Avatar>
                     ))}
                   </Group>
                   <Text weight="bold" color="dimmed">
