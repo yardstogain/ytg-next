@@ -9,7 +9,7 @@ import {
   Title,
   Stack,
 } from '@mantine/core';
-import { supabaseServerClient } from '@supabase/auth-helpers-nextjs';
+import { getUser, supabaseServerClient } from '@supabase/auth-helpers-nextjs';
 import { MarkdownContent, RoleBadge } from 'components';
 import { schedule } from 'data/schedule2022';
 import {
@@ -40,6 +40,8 @@ type ProfileWithContentAndFraudData = Profile & {
   fraudListWinnings: FraudListWinnings[];
 };
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { user } = await getUser(ctx);
+
   const { data: profile } = await supabaseServerClient(ctx)
     .from<ProfileWithContentAndFraudData>('profile')
     .select('*, content(*, comments(id)), fraudPicks(*), fraudListWinnings(*)')
@@ -55,15 +57,22 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const now = new Date();
   const weekLocked = now >= getCurrentWeek(schedule).startDate;
 
-  return { props: { profile, weekLocked } };
+  const viewingOwnProfile = user.id === profile.id;
+
+  return { props: { profile, weekLocked, viewingOwnProfile } };
 };
 
 type ProfileProps = {
   profile: ProfileWithContentAndFraudData;
   weekLocked: boolean;
+  viewingOwnProfile: boolean;
 };
 
-export default function UserProfile({ profile, weekLocked }: ProfileProps) {
+export default function UserProfile({
+  profile,
+  weekLocked,
+  viewingOwnProfile,
+}: ProfileProps) {
   const router = useRouter();
 
   const seasonsFraudListWinnings = profile.fraudListWinnings?.reduce(
@@ -176,7 +185,11 @@ export default function UserProfile({ profile, weekLocked }: ProfileProps) {
                       <Avatar
                         key={team}
                         size={64}
-                        src={weekLocked ? getTeamIcon(team) : null}
+                        src={
+                          weekLocked || viewingOwnProfile
+                            ? getTeamIcon(team)
+                            : null
+                        }
                         radius="xl"
                         p={4}
                         mr="xs"
