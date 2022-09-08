@@ -19,6 +19,7 @@ import { PageHeader } from 'components';
 import {
   AlertCircle,
   BallAmericanFootball,
+  Check,
   Key,
   Lock,
   Mail,
@@ -197,7 +198,7 @@ export default function SignUp() {
           <TextInput
             size="md"
             label="Email"
-            description="We'll only spam you when we want"
+            description="We'll confirm this when you're done"
             icon={<Mail />}
             value={email}
             onChange={setEmail}
@@ -212,11 +213,18 @@ export default function SignUp() {
             onChange={setPassword}
             required
           />
+          {/* TODO: hard coded color */}
           <PasswordInput
             size="md"
             label="Confirm Password"
             description=""
-            icon={<Lock />}
+            icon={
+              password !== passwordConfirm ? (
+                <Lock />
+              ) : (
+                <Check color="#099268" />
+              )
+            }
             value={passwordConfirm}
             onChange={setPasswordConfirm}
             required

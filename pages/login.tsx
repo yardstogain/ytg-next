@@ -22,6 +22,7 @@ export default function LoginPage() {
   const [password, setPassword] = useInputState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [checkEmail, setCheckEmail] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -38,11 +39,17 @@ export default function LoginPage() {
         email,
         password,
       },
-      { redirectTo: '/' },
+      { redirectTo: '/', shouldCreateUser: false },
     );
+
     if (error) {
       setMessage(error.message);
+    } else {
+      if (password.length === 0) {
+        setCheckEmail(true);
+      }
     }
+
     // if (!error) {
     //   router.replace('/');
     // }
@@ -81,15 +88,26 @@ export default function LoginPage() {
             </Alert>
           </Card.Section>
         )}
-        <Alert
-          icon={<Wand size={16} />}
-          title="No Password Required!"
-          color="blue"
-          mb="md"
-        >
-          Leave the password field blank and you'll get an email with a link to
-          log you in
-        </Alert>
+        {checkEmail ? (
+          <Alert
+            icon={<Wand size={16} />}
+            title="Check your email!"
+            color="teal"
+            mb="md"
+          >
+            You should have an email from us with a link to login
+          </Alert>
+        ) : (
+          <Alert
+            icon={<Wand size={16} />}
+            title="No Password Required!"
+            color="blue"
+            mb="md"
+          >
+            Leave the password field blank and you'll get an email with a link
+            to log you in
+          </Alert>
+        )}
         <form onSubmit={handleLogin}>
           <TextInput
             label="Email"
@@ -105,7 +123,6 @@ export default function LoginPage() {
             value={password}
             onChange={setPassword}
             size="md"
-            required
             mt="md"
           />
 
