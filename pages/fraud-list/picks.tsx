@@ -21,7 +21,7 @@ type FraudPicksWithPartialProfile = FraudPicks & {
 };
 
 export const getServerSideProps = withPageAuth({
-  redirectTo: '/login',
+  redirectTo: '/login?f=ar',
   async getServerSideProps(ctx) {
     const { user } = await getUser(ctx);
     const weekData = getCurrentWeek(schedule);

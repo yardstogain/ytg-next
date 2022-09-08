@@ -33,7 +33,7 @@ import {
 import { Profile } from 'types/user';
 
 export const getServerSideProps = withPageAuth({
-  redirectTo: '/login',
+  redirectTo: '/login?f=ar',
   async getServerSideProps(ctx) {
     const { user } = await getUser(ctx);
 

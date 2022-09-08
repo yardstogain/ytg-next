@@ -36,7 +36,7 @@ type ProfileWithFraudPicks = Profile & {
 };
 
 export const getServerSideProps = withPageAuth({
-  redirectTo: '/login',
+  redirectTo: '/login?f=ar',
   async getServerSideProps(ctx) {
     const weekData = getCurrentWeek(schedule);
 

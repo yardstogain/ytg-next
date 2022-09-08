@@ -19,10 +19,10 @@ import {
   supabaseClient,
   supabaseServerClient,
   User,
-  withPageAuth,
 } from '@supabase/auth-helpers-nextjs';
 import { MarkdownContent } from 'components';
 import { getUserAvatar, relativeTime, renderPageTitle } from 'lib/utils';
+import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -48,40 +48,37 @@ type EnhancedContent = Content & {
   comments: EnhancedComment[];
 };
 
-export const getServerSideProps = withPageAuth({
-  redirectTo: '/login',
-  async getServerSideProps(ctx) {
-    const { data: content } = await supabaseServerClient(ctx)
-      .from<EnhancedContent>('content')
-      .select(
-        `
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { data: content } = await supabaseServerClient(ctx)
+    .from<EnhancedContent>('content')
+    .select(
+      `
         *, 
         profile(id, nickname, teamName, slug), 
         comments(*, profile(id, nickname, teamName, slug))
         `,
-      )
-      .match({ id: ctx.query.id })
-      .single();
+    )
+    .match({ id: ctx.query.id })
+    .single();
 
-    if (!content) {
-      return {
-        notFound: true,
-      };
-    }
+  if (!content) {
+    return {
+      notFound: true,
+    };
+  }
 
-    const { data: taggedUsers } = await supabaseServerClient(ctx)
-      .from<Profile>('profile')
-      .select('nickname, slug')
-      .in('id', [...content.playerTags]);
+  const { data: taggedUsers } = await supabaseServerClient(ctx)
+    .from<Profile>('profile')
+    .select('nickname, slug')
+    .in('id', [...content.playerTags]);
 
-    const { data: tags } = await supabaseServerClient(ctx)
-      .from<Tag>('tags')
-      .select('*')
-      .in('slug', [...content.tags]);
+  const { data: tags } = await supabaseServerClient(ctx)
+    .from<Tag>('tags')
+    .select('*')
+    .in('slug', [...content.tags]);
 
-    return { props: { content, taggedUsers, tags } };
-  },
-});
+  return { props: { content, taggedUsers, tags } };
+};
 
 type ContentAuthorProps = {
   profile: EnhancedContent['profile'];
@@ -250,23 +247,35 @@ export default function SinglePost({
                 />
               ))}
               <Box p="md" id="comment-form">
-                <Title order={4} mb="xs">
-                  <Text component="span" color="dimmed" mr={8}>
-                    <MessageCircle size={16} />
-                  </Text>
-                  Jump in
-                </Title>
-                <Textarea
-                  size="md"
-                  label="Reply"
-                  description="Don't be too nice, and make sure everything is in writing"
-                  minRows={4}
-                  value={commentContent}
-                  onChange={setCommentContent}
-                />
-                <Button mt="sm" loading={loading} onClick={handleCommentSubmit}>
-                  Submit
-                </Button>
+                {user ? (
+                  <>
+                    <Title order={4} mb="xs">
+                      <Text component="span" color="dimmed" mr={8}>
+                        <MessageCircle size={16} />
+                      </Text>
+                      Jump in
+                    </Title>
+                    <Textarea
+                      size="md"
+                      label="Reply"
+                      description="Don't be too nice, and make sure everything is in writing"
+                      minRows={4}
+                      value={commentContent}
+                      onChange={setCommentContent}
+                    />
+                    <Button
+                      mt="sm"
+                      loading={loading}
+                      onClick={handleCommentSubmit}
+                    >
+                      Submit
+                    </Button>
+                  </>
+                ) : (
+                  <Button component={NextLink} href="/login" variant="subtle">
+                    Login to Reply
+                  </Button>
+                )}
               </Box>
             </Card>
           </>

@@ -57,7 +57,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const now = new Date();
   const weekLocked = now >= getCurrentWeek(schedule).startDate;
 
-  const viewingOwnProfile = user.id === profile.id;
+  const viewingOwnProfile = user?.id === profile.id;
 
   return { props: { profile, weekLocked, viewingOwnProfile } };
 };

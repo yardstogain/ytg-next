@@ -5,15 +5,17 @@ import {
   Button,
   Card,
   Alert,
+  Anchor,
 } from '@mantine/core';
 import { useInputState } from '@mantine/hooks';
 import { useState, useEffect } from 'react';
 import { supabaseClient } from '@supabase/auth-helpers-nextjs';
 import { useUser } from '@supabase/auth-helpers-react';
 import { PageHeader } from 'components';
-import { AlertCircle, Login, Wand } from 'tabler-icons-react';
+import { AlertCircle, Login, UserExclamation, Wand } from 'tabler-icons-react';
 import { useRouter } from 'next/router';
 import { renderPageTitle } from 'lib/utils';
+import { NextLink } from '@mantine/next';
 
 export default function LoginPage() {
   const { user } = useUser();
@@ -65,7 +67,6 @@ export default function LoginPage() {
         icon={<Login size={48} />}
         iconColor="yellow"
       />
-
       <Card
         withBorder
         shadow="md"
@@ -87,6 +88,20 @@ export default function LoginPage() {
               {message}
             </Alert>
           </Card.Section>
+        )}
+        {router.query.f === 'ar' && (
+          <Alert
+            icon={<UserExclamation size={16} />}
+            title="That needs an account"
+            color="yellow"
+            mb="md"
+          >
+            You need to be logged in to access that page.{' '}
+            <Anchor component={NextLink} href="/sign-up">
+              Sign up
+            </Anchor>{' '}
+            today to get start!
+          </Alert>
         )}
         {checkEmail ? (
           <Alert
