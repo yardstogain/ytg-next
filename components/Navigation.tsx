@@ -20,6 +20,7 @@ import {
   FilePlus,
   Trophy,
   LockAccess,
+  Files,
 } from 'tabler-icons-react';
 import { LogoIcon } from './LogoIcon';
 import { NextLink } from '@mantine/next';
@@ -194,22 +195,14 @@ export function Navigation() {
           {user ? (
             <>
               {profile ? (
-                <Group
-                  spacing={0}
-                  position="apart"
-                  sx={{
-                    width: '100%',
-                  }}
+                <Text
+                  size="xs"
+                  weight={700}
+                  transform="uppercase"
+                  color="dimmed"
                 >
-                  <Text
-                    size="xs"
-                    weight={700}
-                    transform="uppercase"
-                    color="dimmed"
-                  >
-                    {profile.nickname}
-                  </Text>
-                </Group>
+                  {profile.nickname}
+                </Text>
               ) : (
                 <Skeleton radius="xl" height={18} width={64} />
               )}
@@ -227,14 +220,6 @@ export function Navigation() {
                 icon={<Share className={classes.linkIcon} />}
                 label="Invite a Friend"
                 active={router.pathname.includes('/invite')}
-              />
-              <NavLink
-                className={classes.link}
-                component={NextLink}
-                href="/posts/new"
-                icon={<FilePlus className={classes.linkIcon} />}
-                label="New Post"
-                active={router.pathname === '/posts/new'}
               />
               <NavLink
                 className={classes.link}
@@ -293,6 +278,31 @@ export function Navigation() {
           icon={<Ladder className={classes.linkIcon} />}
           label="Ladder"
           active={router.pathname === '/fraud-list/ladder'}
+        />
+        <Text
+          size="xs"
+          mt="md"
+          weight={700}
+          transform="uppercase"
+          color="dimmed"
+        >
+          Content
+        </Text>
+        <NavLink
+          className={classes.link}
+          component={NextLink}
+          href="/posts"
+          icon={<Files className={classes.linkIcon} />}
+          label="All Posts"
+          active={router.pathname === '/posts'}
+        />
+        <NavLink
+          className={classes.link}
+          component={NextLink}
+          href="/posts/new"
+          icon={<FilePlus className={classes.linkIcon} />}
+          label="New Post"
+          active={router.pathname === '/posts/new'}
         />
       </Navbar.Section>
       {user && (

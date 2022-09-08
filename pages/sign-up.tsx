@@ -10,6 +10,7 @@ import {
   Group,
   Title,
   List,
+  Code,
 } from '@mantine/core';
 import { useInputState } from '@mantine/hooks';
 import { useState, useEffect } from 'react';
@@ -26,6 +27,7 @@ import {
   Pencil,
   User,
   UserPlus,
+  Wand,
 } from 'tabler-icons-react';
 import { useRouter } from 'next/router';
 import { betaKeys } from 'data/betaKeys';
@@ -39,6 +41,7 @@ export default function SignUp() {
   // Loading and error
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
+  const [checkEmail, setCheckEmail] = useState(false);
   // Fields
   const [email, setEmail] = useInputState('');
   const [password, setPassword] = useInputState('');
@@ -70,6 +73,7 @@ export default function SignUp() {
     setName('');
     setNickname('');
     setTeamName('');
+    setCheckEmail(false);
   };
 
   const addError = (message: string) => {
@@ -102,6 +106,7 @@ export default function SignUp() {
 
   const handleSignUp = async () => {
     setLoading(true);
+    setCheckEmail(false);
     setErrors([]);
 
     const isValid = validate();
@@ -141,6 +146,7 @@ export default function SignUp() {
             icon: <AlertCircle />,
           });
         }
+        setCheckEmail(true);
       }
     }
     setLoading(false);
@@ -179,6 +185,10 @@ export default function SignUp() {
           <Text color="dimmed">
             The Pool is currently in private beta, so you'll need a key to sign
             up. If you don't know where to get one, you're probably not invited.
+          </Text>
+          <Text color="dimmed" size="sm">
+            Feel free to hit up <Code color="blue">help@thepool.app</Code> to
+            complain or ask for one.
           </Text>
           <Stack spacing={0} sx={{ width: '50%' }}>
             <TextInput
@@ -259,7 +269,18 @@ export default function SignUp() {
             required
           />
         </Stack>
+
         <Card mt="xl" shadow="md" withBorder>
+          {checkEmail && (
+            <Alert
+              icon={<Wand size={16} />}
+              title="Check your email!"
+              color="teal"
+              mb="md"
+            >
+              You should have an email from us with a link to login
+            </Alert>
+          )}
           <Group spacing="sm">
             <Button type="submit" onClick={handleSignUp} loading={loading}>
               Create Account

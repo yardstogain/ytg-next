@@ -260,7 +260,7 @@ export default function Index({
   }
 
   return (
-    <Container size="xl">
+    <Container size="lg">
       {renderPageTitle('Home')}
       {user ? (
         <LoggedInHome

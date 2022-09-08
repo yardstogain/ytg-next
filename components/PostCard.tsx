@@ -1,7 +1,7 @@
 import { Avatar, Badge, Card, Group, Text } from '@mantine/core';
+import { NextLink } from '@mantine/next';
 import { MarkdownContent } from 'components';
 import { getUserAvatar, relativeTime } from 'lib/utils';
-import { useRouter } from 'next/router';
 import { Calendar, MessageCircle } from 'tabler-icons-react';
 import { FullContent } from 'types/content';
 
@@ -10,17 +10,14 @@ type PostCardProps = {
   calledOut?: boolean;
 };
 export function PostCard({ post, calledOut }: PostCardProps) {
-  const router = useRouter();
-
   return (
     <Card
       withBorder
       shadow="lg"
       mb="md"
       pt={0}
-      onClick={() => {
-        router.push(`/posts/${post.id}`);
-      }}
+      component={NextLink}
+      href={`/posts/${post.id}`}
       sx={(theme) => ({
         background: 'transparent',
         cursor: 'pointer',
