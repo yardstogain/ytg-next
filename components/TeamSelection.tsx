@@ -103,7 +103,9 @@ export function TeamSelection({
         if (!error) {
           showNotification({
             title: 'Picks updated!',
-            message: `You now have ${totalWager()} on the line`,
+            message: `You now have ${currencyFormatter.format(
+              totalWager,
+            )} on the line`,
             color: 'teal',
             icon: <Check />,
           });
@@ -132,7 +134,9 @@ export function TeamSelection({
       if (!error) {
         showNotification({
           title: 'Picks made!',
-          message: `You put ${totalWager()} on the line`,
+          message: `You put ${currencyFormatter.format(
+            totalWager,
+          )} on the line`,
           color: 'teal',
           icon: <Check />,
         });
@@ -193,14 +197,10 @@ export function TeamSelection({
     );
   };
 
-  const totalWager = (): string => {
-    const wager = selection.reduce(
-      (acc, curr) => acc + teamLookup[curr].fraudValue,
-      0,
-    );
-
-    return currencyFormatter.format(wager);
-  };
+  const totalWager = selection.reduce(
+    (acc, curr) => acc + teamLookup[curr].fraudValue,
+    0,
+  );
 
   const rows = teams.map((team) => {
     const selected = selection.includes(team.id);
@@ -236,6 +236,7 @@ export function TeamSelection({
           <Checkbox
             checked={selection.includes(id)}
             onChange={() => toggleRow(id)}
+            onClick={() => toggleRow(id)}
             transitionDuration={0}
             disabled={weekIsLocked}
           />
@@ -282,14 +283,19 @@ export function TeamSelection({
         <Grid.Col xs={3}>
           <Card shadow="sm" withBorder>
             <Title order={6}>Your wager</Title>
-            <Text size={36} weight={700} align="center" color="teal">
-              {totalWager()}
+            <Text
+              size={36}
+              weight={700}
+              align="center"
+              color={totalWager > 0 ? 'teal' : 'red'}
+            >
+              {currencyFormatter.format(totalWager)}
             </Text>
             <Button
               fullWidth
               onClick={submitFraudPicks}
               loading={loading}
-              disabled={selection.length < 3 || weekIsLocked}
+              disabled={selection.length < 3 || weekIsLocked || totalWager <= 0}
             >
               {weekIsLocked ? 'Locked In' : 'Submit'}
             </Button>
