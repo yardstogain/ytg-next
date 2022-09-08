@@ -5,6 +5,7 @@ import { MantineProvider } from '@mantine/core';
 import { supabaseClient } from '@supabase/auth-helpers-nextjs';
 import { UserProvider } from '@supabase/auth-helpers-react';
 import { NotificationsProvider } from '@mantine/notifications';
+import PlausibleProvider from 'next-plausible';
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -18,22 +19,24 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name="author" content="The Pool Team" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <MantineProvider
-        theme={{
-          colorScheme: 'dark',
-          fontFamily:
-            '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
-        }}
-        withNormalizeCSS
-        withGlobalStyles
-      >
-        <NotificationsProvider>
-          <RouterTransition />
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </NotificationsProvider>
-      </MantineProvider>
+      <PlausibleProvider domain="thepool.app">
+        <MantineProvider
+          theme={{
+            colorScheme: 'dark',
+            fontFamily:
+              '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
+          }}
+          withNormalizeCSS
+          withGlobalStyles
+        >
+          <NotificationsProvider>
+            <RouterTransition />
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </NotificationsProvider>
+        </MantineProvider>
+      </PlausibleProvider>
     </UserProvider>
   );
 }

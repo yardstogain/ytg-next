@@ -14,6 +14,7 @@ import {
   Title,
 } from '@mantine/core';
 import { useInputState } from '@mantine/hooks';
+import { NextLink } from '@mantine/next';
 import {
   supabaseClient,
   supabaseServerClient,
@@ -334,17 +335,16 @@ export default function SinglePost({
             ))}
           </Card>
           <Card withBorder shadow="lg">
-            <Link href="/posts/new" passHref>
-              <Button
-                component="a"
-                variant="gradient"
-                gradient={{ from: 'pink', to: 'orange' }}
-                leftIcon={<FilePlus size={16} />}
-                fullWidth
-              >
-                New Post
-              </Button>
-            </Link>
+            <Button
+              component={NextLink}
+              href="/posts/new"
+              variant="gradient"
+              gradient={{ from: 'pink', to: 'orange' }}
+              leftIcon={<FilePlus size={16} />}
+              fullWidth
+            >
+              New Post
+            </Button>
           </Card>
         </Grid.Col>
       </Grid>

@@ -9,6 +9,7 @@ import {
   Title,
   Stack,
 } from '@mantine/core';
+import { NextLink } from '@mantine/next';
 import { getUser, supabaseServerClient } from '@supabase/auth-helpers-nextjs';
 import { MarkdownContent, RoleBadge } from 'components';
 import { schedule } from 'data/schedule2022';
@@ -21,7 +22,6 @@ import {
   renderPageTitle,
 } from 'lib/utils';
 import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
 import {
   BallAmericanFootball,
   Calendar,
@@ -73,8 +73,6 @@ export default function UserProfile({
   weekLocked,
   viewingOwnProfile,
 }: ProfileProps) {
-  const router = useRouter();
-
   const seasonsFraudListWinnings = profile.fraudListWinnings?.reduce(
     (acc, curr) => {
       return acc + curr.winnings;
@@ -88,7 +86,7 @@ export default function UserProfile({
   );
 
   return (
-    <Container size="xl">
+    <Container size="lg">
       {renderPageTitle(`${profile.nickname} - Profile`)}
       <Group spacing={0} mt="xl">
         <Avatar src={getUserAvatar(profile.id)} mr="md" radius="xl" size={64} />
@@ -121,9 +119,8 @@ export default function UserProfile({
                 key={piece.id}
                 mb="lg"
                 pt={0}
-                onClick={() => {
-                  router.push(`/posts/${piece.id}`);
-                }}
+                component={NextLink}
+                href={`/posts/${piece.id}`}
                 sx={(theme) => ({
                   background: 'transparent',
                   cursor: 'pointer',
