@@ -61,11 +61,11 @@ export type FraudPicks = {
 export type SimpleTeamData = {
   id: TeamSlug | string;
   name: string;
-  icon: string;
   wins: number;
   losses: number;
   ties: number;
   fraudValue: number;
+  abbr: string;
 };
 
 export type FraudListResults = {

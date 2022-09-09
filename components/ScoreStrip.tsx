@@ -1,5 +1,5 @@
-import { Card, Group, ScrollArea, Text } from '@mantine/core';
-import { relativeTime } from 'lib/utils';
+import { Avatar, Card, Group, ScrollArea, Text } from '@mantine/core';
+import { getTeamIcon, relativeTime, reverseAbbrLookup } from 'lib/utils';
 import { BallAmericanFootball } from 'tabler-icons-react';
 
 type ESPNTeam = {
@@ -9,10 +9,9 @@ type ESPNTeam = {
 type Competition = {
   competitors: Competitor[];
   date: string;
-  possession: string;
   situation?: {
     isRedZone: boolean;
-    possession: string;
+    possession: Competitor['id'];
   };
   status: {
     displayClock: string;
@@ -22,7 +21,8 @@ type Competition = {
         | 'STATUS_IN_PROGRESS'
         | 'STATUS_SCHEDULED'
         | 'STATUS_END_PERIOD'
-        | 'STATUS_HALFTIME';
+        | 'STATUS_HALFTIME'
+        | 'STATUS_Final';
       shortDetail: string;
     };
   };
@@ -78,39 +78,57 @@ export function ScoreStrip({ data }: ScoreStripProps) {
               })}
             >
               <Group position="apart">
-                <Text size="xs" weight="bold">
-                  {away?.team.abbreviation}{' '}
-                  {/* <Text
-                    component="span"
-                    size={10}
-                    color="gray.7"
-                    sx={{ verticalAlign: 'text-bottom' }}
-                  >
-                    @
-                  </Text> */}
-                  {comp.situation?.possession === away?.id && (
-                    <BallAmericanFootball
-                      color="rgba(255,255,255,0.5)"
-                      size={12}
-                      style={{ marginBottom: -2 }}
-                    />
-                  )}
-                </Text>
+                <Group spacing={4}>
+                  <Avatar
+                    size={16}
+                    radius="xl"
+                    src={
+                      away?.team.abbreviation
+                        ? getTeamIcon(
+                            reverseAbbrLookup[away?.team.abbreviation],
+                          )
+                        : ''
+                    }
+                  />
+                  <Text size="xs" weight="bold">
+                    {away?.team.abbreviation}{' '}
+                    {comp.situation?.possession === away?.id && (
+                      <BallAmericanFootball
+                        color="rgba(255,255,255,0.5)"
+                        size={12}
+                        style={{ marginBottom: -2 }}
+                      />
+                    )}
+                  </Text>
+                </Group>
                 <Text size="xs" color="dimmed">
                   {away?.score}
                 </Text>
               </Group>
               <Group position="apart">
-                <Text size="xs" weight="bold">
-                  {home?.team.abbreviation}{' '}
-                  {comp.situation?.possession === home?.id && (
-                    <BallAmericanFootball
-                      color="rgba(255,255,255,0.5)"
-                      size={12}
-                      style={{ marginBottom: -2 }}
-                    />
-                  )}
-                </Text>
+                <Group spacing={4}>
+                  <Avatar
+                    size={16}
+                    radius="xl"
+                    src={
+                      home?.team.abbreviation
+                        ? getTeamIcon(
+                            reverseAbbrLookup[home?.team.abbreviation],
+                          )
+                        : ''
+                    }
+                  />
+                  <Text size="xs" weight="bold">
+                    {home?.team.abbreviation}{' '}
+                    {comp.situation?.possession === home?.id && (
+                      <BallAmericanFootball
+                        color="rgba(255,255,255,0.5)"
+                        size={12}
+                        style={{ marginBottom: -2 }}
+                      />
+                    )}
+                  </Text>
+                </Group>
                 <Text size="xs" color="dimmed">
                   {home?.score}
                 </Text>

@@ -1,7 +1,6 @@
 import { Container, Group, Title, Button } from '@mantine/core';
 import { PageHeader, TeamSelection } from 'components';
-import { csvToTeamsData, getCurrentWeek, renderPageTitle } from 'lib/utils';
-import { stats2021 } from 'data/stats2021';
+import { teamData, getCurrentWeek, renderPageTitle } from 'lib/utils';
 import { schedule } from 'data/schedule2022';
 import {
   getUser,
@@ -75,7 +74,7 @@ export default function FraudListPicks({
         </Link>
       </Group>
       <TeamSelection
-        teams={csvToTeamsData(stats2021)}
+        teams={teamData}
         activeFraudPicks={activeFraudPicks}
         matchups={weekData}
       />
