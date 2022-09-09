@@ -260,7 +260,7 @@ export default function Index({
     console.log('in UE');
     if (clientUser && !isLoading && !user) {
       console.log('in cond', clientUser, user);
-      router.replace(router.asPath);
+      router.reload();
     }
   }, [user, isLoading]);
 
@@ -271,6 +271,8 @@ export default function Index({
       </Stack>
     );
   }
+
+  console.log(scoreStrip);
 
   return (
     <>

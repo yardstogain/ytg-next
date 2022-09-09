@@ -1,5 +1,6 @@
 import { Card, Group, ScrollArea, Text } from '@mantine/core';
 import { relativeTime } from 'lib/utils';
+import { BallAmericanFootball } from 'tabler-icons-react';
 
 type ESPNTeam = {
   abbreviation: string;
@@ -8,9 +9,22 @@ type ESPNTeam = {
 type Competition = {
   competitors: Competitor[];
   date: string;
+  possession: string;
+  situation?: {
+    isRedZone: boolean;
+    possession: string;
+  };
   status: {
     displayClock: string;
     period: number;
+    type: {
+      name:
+        | 'STATUS_IN_PROGRESS'
+        | 'STATUS_SCHEDULED'
+        | 'STATUS_END_PERIOD'
+        | 'STATUS_HALFTIME';
+      shortDetail: string;
+    };
   };
 };
 
@@ -18,6 +32,7 @@ type Competitor = {
   homeAway: 'home' | 'away';
   score: string;
   team: ESPNTeam;
+  id: string;
 };
 
 type ESPNEvent = {
@@ -53,19 +68,33 @@ export function ScoreStrip({ data }: ScoreStripProps) {
               px={8}
               pb={0}
               pt={4}
-              sx={{ width: 100 }}
+              sx={(theme) => ({
+                width: 100,
+                borderColor: comp.situation?.isRedZone
+                  ? theme.colors.red[8]
+                  : comp.status.type.name === 'STATUS_IN_PROGRESS'
+                  ? theme.colors.blue[7]
+                  : theme.colors.gray[8],
+              })}
             >
               <Group position="apart">
                 <Text size="xs" weight="bold">
                   {away?.team.abbreviation}{' '}
-                  <Text
+                  {/* <Text
                     component="span"
                     size={10}
                     color="gray.7"
                     sx={{ verticalAlign: 'text-bottom' }}
                   >
                     @
-                  </Text>
+                  </Text> */}
+                  {comp.situation?.possession === away?.id && (
+                    <BallAmericanFootball
+                      color="rgba(255,255,255,0.5)"
+                      size={12}
+                      style={{ marginBottom: -2 }}
+                    />
+                  )}
                 </Text>
                 <Text size="xs" color="dimmed">
                   {away?.score}
@@ -73,16 +102,23 @@ export function ScoreStrip({ data }: ScoreStripProps) {
               </Group>
               <Group position="apart">
                 <Text size="xs" weight="bold">
-                  {home?.team.abbreviation}
+                  {home?.team.abbreviation}{' '}
+                  {comp.situation?.possession === home?.id && (
+                    <BallAmericanFootball
+                      color="rgba(255,255,255,0.5)"
+                      size={12}
+                      style={{ marginBottom: -2 }}
+                    />
+                  )}
                 </Text>
                 <Text size="xs" color="dimmed">
                   {home?.score}
                 </Text>
               </Group>
               <Text size="xs" color="dimmed">
-                {comp.status.period === 0
+                {comp.status.type.name === 'STATUS_SCHEDULED'
                   ? relativeTime.from(new Date(comp.date))
-                  : `${comp.status.displayClock} Q${comp.status.period}`}
+                  : comp.status.type.shortDetail}
               </Text>
             </Card>
           );
