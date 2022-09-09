@@ -14,7 +14,6 @@ import {
   ListCheck,
   User,
   Ladder,
-  Share,
   Login,
   UserPlus,
   FilePlus,
