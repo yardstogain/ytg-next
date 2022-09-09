@@ -1,26 +1,9 @@
 import { MantineColor } from '@mantine/core';
-import { User } from '@supabase/supabase-js';
 import RelativeTime from '@yaireo/relative-time';
 import { stats2021 } from 'data/stats2021';
 import Head from 'next/head';
 import { Schedule, SimpleTeamData, TeamSlug } from 'types/football';
-import { Profile } from 'types/user';
-import { roles } from './constants';
-import { supabase } from './initSupabase';
-
-export function isLoggedIn(user: User | null) {
-  return user != null && user.role === 'authenticated';
-}
-
-export async function signOut() {
-  const { error } = await supabase.auth.signOut();
-
-  if (!error) {
-    if (window.location.pathname !== '/') {
-      window.location.href = '/';
-    }
-  }
-}
+import { roles, abbrLookup } from './constants';
 
 export function csvToTeamsData(csv: string): SimpleTeamData[] {
   // TODO: better line split
@@ -45,19 +28,26 @@ export function csvToTeamsData(csv: string): SimpleTeamData[] {
         ,
       ] = numericalStats;
 
-      const fraudValue = getfraudValue({
+      const fraudValue = getFraudValue({
         winPercent,
         pointDiff,
         marginOfVictory,
         strengthOfSchedule,
       });
-      return { name, wins, losses, ties, fraudValue, icon: 'cats' };
+
+      return { name, wins, losses, ties, fraudValue };
     })
     .sort((a, b) => b.fraudValue - a.fraudValue)
-    .map((team) => ({
-      id: team.name.toLowerCase().split(' ').join('-'),
-      ...team,
-    }));
+    .map((team) => {
+      const id = team.name.toLowerCase().split(' ').join('-') as TeamSlug;
+      const abbr = abbrLookup[id];
+
+      return {
+        id,
+        abbr,
+        ...team,
+      };
+    });
 }
 
 export type fraudValueInput = {
@@ -67,7 +57,7 @@ export type fraudValueInput = {
   strengthOfSchedule: number;
 };
 
-export function getfraudValue({
+export function getFraudValue({
   winPercent,
   pointDiff,
   marginOfVictory,
@@ -151,27 +141,9 @@ export function getCurrentWeek(schedule: Schedule[]): Schedule {
   return selectedWeek;
 }
 
-export const validateNickname = (nickname: string): boolean => {
-  const nickRegex = /^[a-z0-9]+(?:[_-][a-z0-9]+)*$/;
-  return nickRegex.test(nickname);
-};
-
 export const validateEmail = (email: string): boolean => {
   const emailRegex = /^\S+@\S+\.\S+$/;
   return emailRegex.test(email);
-};
-
-export const getDisplayName = (
-  profile: Partial<Profile>,
-  fallback: string,
-): string => {
-  if (profile.nickname) {
-    return profile.nickname;
-  } else if (profile.name) {
-    return profile.name;
-  } else {
-    return fallback;
-  }
 };
 
 export const currencyFormatter = new Intl.NumberFormat('en-US', {
@@ -199,16 +171,27 @@ export const teamLookup: Record<string, SimpleTeamData> = teamData.reduce(
   {},
 );
 
+// TODO: the kind of thing that a test is good for
 export const calculateFraudListWinnings = (
   picks: TeamSlug[],
   losers: TeamSlug[],
 ): number => {
-  return picks.reduce((acc, curr) => {
+  let winnerCount = 0;
+  const baseSum = picks.reduce((acc, curr) => {
     if (losers.includes(curr)) {
+      winnerCount += 1;
       return acc + teamLookup[curr].fraudValue;
     }
     return acc;
   }, 0);
+
+  if (winnerCount <= 1) {
+    return baseSum;
+  } else if (winnerCount === 2) {
+    return baseSum * 1.5;
+  } else {
+    return baseSum * 2.5;
+  }
 };
 
 export const getLadderColor = (rank: number): MantineColor => {
@@ -233,15 +216,11 @@ export const renderPageTitle = (title: string) => (
 
 export const relativeTime = new RelativeTime();
 
-export const greet = (greetee: string): string => {
-  const greetings = ['Greetings', 'Howdy', 'Ayo'];
-
-  return `${
-    greetings[Math.floor(Math.random() * greetings.length)]
-  }, ${greetee}`;
-};
-
 export const getTotalWager = (picks: TeamSlug[]): number =>
   picks.reduce((acc, curr) => {
     return acc + teamLookup[curr].fraudValue;
   }, 0);
+
+export const reverseAbbrLookup: Record<string, TeamSlug> = Object.entries(
+  abbrLookup,
+).reduce((acc, [key, value]) => ({ ...acc, [value]: [key] }), {});

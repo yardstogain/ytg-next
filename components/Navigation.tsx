@@ -14,7 +14,6 @@ import {
   ListCheck,
   User,
   Ladder,
-  Share,
   Login,
   UserPlus,
   FilePlus,
@@ -213,14 +212,14 @@ export function Navigation() {
                 icon={<User className={classes.linkIcon} />}
                 label="My Profile"
               />
-              <NavLink
+              {/* <NavLink
                 className={classes.link}
                 component={NextLink}
                 href="/invite"
                 icon={<Share className={classes.linkIcon} />}
                 label="Invite a Friend"
                 active={router.pathname.includes('/invite')}
-              />
+              /> */}
               <NavLink
                 className={classes.link}
                 component={NextLink}

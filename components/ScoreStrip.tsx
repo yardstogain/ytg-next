@@ -1,16 +1,32 @@
-import { Card, Group, ScrollArea, Text } from '@mantine/core';
-import { relativeTime } from 'lib/utils';
+import { Avatar, Card, Group, ScrollArea, Text } from '@mantine/core';
+import { getTeamIcon, relativeTime, reverseAbbrLookup } from 'lib/utils';
+import { BallAmericanFootball } from 'tabler-icons-react';
 
 type ESPNTeam = {
   abbreviation: string;
 };
 
+type StatusTypeName =
+  | 'STATUS_IN_PROGRESS'
+  | 'STATUS_SCHEDULED'
+  | 'STATUS_END_PERIOD'
+  | 'STATUS_HALFTIME'
+  | 'STATUS_Final';
+
 type Competition = {
   competitors: Competitor[];
   date: string;
+  situation?: {
+    isRedZone: boolean;
+    possession: Competitor['id'];
+  };
   status: {
     displayClock: string;
     period: number;
+    type: {
+      name: StatusTypeName;
+      shortDetail: string;
+    };
   };
 };
 
@@ -18,6 +34,7 @@ type Competitor = {
   homeAway: 'home' | 'away';
   score: string;
   team: ESPNTeam;
+  id: string;
 };
 
 type ESPNEvent = {
@@ -34,8 +51,19 @@ type ScoreStripProps = {
 };
 export function ScoreStrip({ data }: ScoreStripProps) {
   if (!data) {
-    return <Text>ESPN broke the data I was stealing</Text>;
+    return null;
   }
+
+  const gameInProgress = (status: StatusTypeName) => {
+    if (
+      ['STATUS_HALFTIME', 'STATUS_END_PERIOD', 'STATUS_IN_PROGRESS'].includes(
+        status,
+      )
+    ) {
+      return true;
+    }
+    return false;
+  };
 
   return (
     <ScrollArea style={{ maxWidth: '70%' }}>
@@ -53,36 +81,75 @@ export function ScoreStrip({ data }: ScoreStripProps) {
               px={8}
               pb={0}
               pt={4}
-              sx={{ width: 100 }}
+              sx={(theme) => ({
+                width: 100,
+                borderColor: comp.situation?.isRedZone // red for redzone
+                  ? theme.colors.red[8]
+                  : gameInProgress(comp.status.type.name) // otherwise, show blue for active games
+                  ? theme.colors.blue[7]
+                  : theme.colors.gray[8],
+              })}
             >
               <Group position="apart">
-                <Text size="xs" weight="bold">
-                  {away?.team.abbreviation}{' '}
-                  <Text
-                    component="span"
-                    size={10}
-                    color="gray.7"
-                    sx={{ verticalAlign: 'text-bottom' }}
-                  >
-                    @
+                <Group spacing={4}>
+                  <Avatar
+                    size={16}
+                    radius="xl"
+                    src={
+                      away?.team.abbreviation
+                        ? getTeamIcon(
+                            reverseAbbrLookup[away?.team.abbreviation],
+                          )
+                        : ''
+                    }
+                  />
+                  <Text size="xs" weight="bold">
+                    {away?.team.abbreviation}{' '}
+                    {comp.situation?.possession === away?.id && (
+                      <BallAmericanFootball
+                        color="rgba(255,255,255,0.5)"
+                        size={12}
+                        style={{ marginBottom: -2 }}
+                      />
+                    )}
                   </Text>
-                </Text>
+                </Group>
                 <Text size="xs" color="dimmed">
                   {away?.score}
                 </Text>
               </Group>
               <Group position="apart">
-                <Text size="xs" weight="bold">
-                  {home?.team.abbreviation}
-                </Text>
+                <Group spacing={4}>
+                  <Avatar
+                    size={16}
+                    radius="xl"
+                    src={
+                      home?.team.abbreviation
+                        ? getTeamIcon(
+                            reverseAbbrLookup[home?.team.abbreviation],
+                          )
+                        : ''
+                    }
+                  />
+                  <Text size="xs" weight="bold">
+                    {home?.team.abbreviation}{' '}
+                    {comp.situation?.possession === home?.id && (
+                      <BallAmericanFootball
+                        color="rgba(255,255,255,0.5)"
+                        size={12}
+                        style={{ marginBottom: -2 }}
+                      />
+                    )}
+                  </Text>
+                </Group>
                 <Text size="xs" color="dimmed">
                   {home?.score}
                 </Text>
               </Group>
               <Text size="xs" color="dimmed">
-                {comp.status.period === 0
+                {comp.status.type.name === 'STATUS_SCHEDULED'
                   ? relativeTime.from(new Date(comp.date))
-                  : `${comp.status.displayClock} Q${comp.status.period}`}
+                  : comp.status.type.shortDetail}
               </Text>
             </Card>
           );
