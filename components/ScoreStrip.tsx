@@ -56,9 +56,9 @@ export function ScoreStrip({ data }: ScoreStripProps) {
 
   const gameInProgress = (status: StatusTypeName) => {
     if (
-      status === 'STATUS_HALFTIME' ||
-      status === 'STATUS_END_PERIOD' ||
-      status === 'STATUS_IN_PROGRESS'
+      ['STATUS_HALFTIME', 'STATUS_END_PERIOD', 'STATUS_IN_PROGRESS'].includes(
+        status,
+      )
     ) {
       return true;
     }
