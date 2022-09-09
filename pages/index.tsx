@@ -272,8 +272,6 @@ export default function Index({
     );
   }
 
-  console.log(scoreStrip);
-
   return (
     <>
       {renderPageTitle('Home')}

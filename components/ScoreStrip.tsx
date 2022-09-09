@@ -6,6 +6,13 @@ type ESPNTeam = {
   abbreviation: string;
 };
 
+type StatusTypeName =
+  | 'STATUS_IN_PROGRESS'
+  | 'STATUS_SCHEDULED'
+  | 'STATUS_END_PERIOD'
+  | 'STATUS_HALFTIME'
+  | 'STATUS_Final';
+
 type Competition = {
   competitors: Competitor[];
   date: string;
@@ -17,12 +24,7 @@ type Competition = {
     displayClock: string;
     period: number;
     type: {
-      name:
-        | 'STATUS_IN_PROGRESS'
-        | 'STATUS_SCHEDULED'
-        | 'STATUS_END_PERIOD'
-        | 'STATUS_HALFTIME'
-        | 'STATUS_Final';
+      name: StatusTypeName;
       shortDetail: string;
     };
   };
@@ -49,8 +51,19 @@ type ScoreStripProps = {
 };
 export function ScoreStrip({ data }: ScoreStripProps) {
   if (!data) {
-    return <Text>ESPN broke the data I was stealing</Text>;
+    return null;
   }
+
+  const gameInProgress = (status: StatusTypeName) => {
+    if (
+      status === 'STATUS_HALFTIME' ||
+      status === 'STATUS_END_PERIOD' ||
+      status === 'STATUS_IN_PROGRESS'
+    ) {
+      return true;
+    }
+    return false;
+  };
 
   return (
     <ScrollArea style={{ maxWidth: '70%' }}>
@@ -70,9 +83,9 @@ export function ScoreStrip({ data }: ScoreStripProps) {
               pt={4}
               sx={(theme) => ({
                 width: 100,
-                borderColor: comp.situation?.isRedZone
+                borderColor: comp.situation?.isRedZone // red for redzone
                   ? theme.colors.red[8]
-                  : comp.status.type.name === 'STATUS_IN_PROGRESS'
+                  : gameInProgress(comp.status.type.name) // otherwise, show blue for active games
                   ? theme.colors.blue[7]
                   : theme.colors.gray[8],
               })}
