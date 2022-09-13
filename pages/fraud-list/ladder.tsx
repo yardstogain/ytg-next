@@ -59,7 +59,7 @@ export default function LadderPage({ usersWithFraudData }: LadderPageProps) {
       }, 0);
       return { ...user, totalWinnings };
     })
-    .filter((team) => team.totalWinnings > 0)
+    // .filter((team) => team.totalWinnings > 0)
     .sort((a, b) => b.totalWinnings - a.totalWinnings);
 
   return (
@@ -76,6 +76,7 @@ export default function LadderPage({ usersWithFraudData }: LadderPageProps) {
           <tr>
             <th>Player</th>
             <th>Most Targeted</th>
+            <th style={{ textAlign: 'right' }}>Weekly Avg.</th>
             <th style={{ textAlign: 'right' }}>Total Winnings</th>
           </tr>
         </thead>
@@ -151,7 +152,26 @@ export default function LadderPage({ usersWithFraudData }: LadderPageProps) {
                 </Group>
               </td>
               <td align="right">
-                <Text size={idx < 3 ? 36 : 24} weight="bolder" color="teal">
+                <Text
+                  size={idx < 3 ? 36 : 24}
+                  weight="bolder"
+                  color={
+                    user.totalWinnings / user.fraudPicks.length > 0
+                      ? 'teal'
+                      : 'red'
+                  }
+                >
+                  {currencyFormatter.format(
+                    user.totalWinnings / user.fraudPicks.length,
+                  )}
+                </Text>
+              </td>
+              <td align="right">
+                <Text
+                  size={idx < 3 ? 36 : 24}
+                  weight="bolder"
+                  color={user.totalWinnings > 0 ? 'teal' : 'red'}
+                >
                   {currencyFormatter.format(user.totalWinnings)}
                 </Text>
               </td>
