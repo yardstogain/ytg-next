@@ -25,6 +25,10 @@ export default function App({ Component, pageProps }: AppProps) {
             colorScheme: 'dark',
             fontFamily:
               '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
+            headings: {
+              fontFamily:
+                '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
+            },
           }}
           withNormalizeCSS
           withGlobalStyles

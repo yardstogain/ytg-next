@@ -34,7 +34,7 @@ export const abbrLookup: Record<TeamSlug, string> = {
   'pittsburgh-steelers': 'PIT',
   'las-vegas-raiders': 'LV',
   'chicago-bears': 'CHI',
-  'washington-commanders': 'WAS',
+  'washington-commanders': 'WSH',
   'carolina-panthers': 'CAR',
   'detroit-lions': 'DET',
   'atlanta-falcons': 'ATL',
