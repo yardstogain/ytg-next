@@ -1,6 +1,7 @@
 import { MantineColor } from '@mantine/core';
 import RelativeTime from '@yaireo/relative-time';
-import { stats2021 } from 'data/stats2021';
+// import { stats2021 } from 'data/stats2021';
+import { stats2022 as currentStats } from 'data/stats2022';
 import Head from 'next/head';
 import { Schedule, SimpleTeamData, TeamSlug } from 'types/football';
 import { roles, abbrLookup } from './constants';
@@ -68,7 +69,7 @@ export function getFraudValue({
       pointDiff * 1.1 +
       marginOfVictory * 0.35 +
       strengthOfSchedule * 0.75) /
-    10
+    1 // was 10 on week 1
   );
 }
 
@@ -162,7 +163,7 @@ export const isAdmin = (role: number) => {
   return role >= roles.admin;
 };
 
-export const teamData = csvToTeamsData(stats2021);
+export const teamData = csvToTeamsData(currentStats);
 
 export const teamLookup: Record<string, SimpleTeamData> = teamData.reduce(
   (acc, curr) => {

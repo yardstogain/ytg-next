@@ -95,7 +95,88 @@ export const schedule: Schedule[] = [
     season: 2022,
     startDate: new Date('2022-09-15T20:15:00-04:00'),
     endDate: new Date('2022-09-19T23:59:00-04:00'),
-    matchups: [],
+    matchups: [
+      {
+        home: 'kansas-city-chiefs',
+        away: 'los-angeles-chargers',
+        time: new Date('2022-09-15T20:15:00-04:00'),
+      },
+      {
+        home: 'baltimore-ravens',
+        away: 'miami-dolphins',
+        time: new Date('2022-09-18T20:13:00-04:00'),
+      },
+      {
+        home: 'cleveland-browns',
+        away: 'new-york-jets',
+        time: new Date('2022-09-18T20:13:00-04:00'),
+      },
+      {
+        home: 'detroit-lions',
+        away: 'washington-commanders',
+        time: new Date('2022-09-18T20:13:00-04:00'),
+      },
+      {
+        home: 'jacksonville-jaguars',
+        away: 'indianapolis-colts',
+        time: new Date('2022-09-18T20:13:00-04:00'),
+      },
+      {
+        home: 'new-orleans-saints',
+        away: 'tampa-bay-buccaneers',
+        time: new Date('2022-09-18T20:13:00-04:00'),
+      },
+      {
+        home: 'new-york-giants',
+        away: 'carolina-panthers',
+        time: new Date('2022-09-18T20:13:00-04:00'),
+      },
+      {
+        home: 'pittsburgh-steelers',
+        away: 'new-england-patriots',
+        time: new Date('2022-09-18T20:13:00-04:00'),
+      },
+      {
+        home: 'los-angeles-rams',
+        away: 'atlanta-falcons',
+        time: new Date('2022-09-18T16:05:00-04:00'),
+      },
+      {
+        home: 'san-francisco-49ers',
+        away: 'seattle-seahawks',
+        time: new Date('2022-09-18T16:05:00-04:00'),
+      },
+      {
+        home: 'dallas-cowboys',
+        away: 'cincinnati-bengals',
+        time: new Date('2022-09-18T16:05:00-04:00'),
+      },
+      {
+        home: 'denver-broncos',
+        away: 'houston-texans',
+        time: new Date('2022-09-18T16:25:00-04:00'),
+      },
+      {
+        home: 'las-vegas-raiders',
+        away: 'arizona-cardinals',
+        time: new Date('2022-09-18T16:25:00-04:00'),
+      },
+      {
+        home: 'green-bay-packers',
+        away: 'chicago-bears',
+        time: new Date('2022-09-18T20:20:00-04:00'),
+      },
+      {
+        home: 'buffalo-bills',
+        away: 'tennessee-titans',
+        time: new Date('2022-09-19T19:15:00-04:00'),
+      },
+      {
+        home: 'philadelphia-eagles',
+        away: 'minnesota-vikings',
+        time: new Date('2022-09-19T20:30:00-04:00'),
+      },
+    ],
   },
   {
     week: 3,

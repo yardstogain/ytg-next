@@ -257,12 +257,13 @@ export default function AdminFraudList() {
       </Stack>
 
       <Card mt="xl" shadow="md" withBorder>
+        {selectedLosers.length !== selectedWeek?.matchups.length && (
+          <Alert color="yellow" mb="md">
+            Not all losers selected. Was there a tie?
+          </Alert>
+        )}
         <Group spacing="sm">
-          <Button
-            onClick={handleSave}
-            loading={loading}
-            disabled={selectedLosers.length !== selectedWeek?.matchups.length}
-          >
+          <Button onClick={handleSave} loading={loading}>
             Save
           </Button>
           <Button onClick={reset} variant="subtle">
