@@ -16,6 +16,7 @@ import {
   getUser,
   supabaseClient,
   supabaseServerClient,
+  User,
   withPageAuth,
 } from '@supabase/auth-helpers-nextjs';
 import { Profile } from 'types/user';
@@ -58,7 +59,11 @@ export const getServerSideProps = withPageAuth({
   },
 });
 
-export default function AdminFraudList() {
+type AdminFraudListProps = {
+  user: User;
+};
+
+export default function AdminFraudList({ user }: AdminFraudListProps) {
   const currentWeek = getCurrentWeek(schedule);
 
   const [loading, setLoading] = useState(false);
@@ -78,7 +83,12 @@ export default function AdminFraudList() {
     // Upsert results
     const { error: upsertError } = await supabaseClient
       .from('fraudListResults')
-      .upsert({ week: week, season: 2022, losers: selectedLosers });
+      .upsert({
+        week: week,
+        season: 2022,
+        losers: selectedLosers,
+        updatedBy: user.id,
+      });
 
     if (upsertError) {
       errorWhileUpdating = true;
