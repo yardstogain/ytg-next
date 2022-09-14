@@ -15,7 +15,6 @@ import { MarkdownContent, RoleBadge } from 'components';
 import { schedule } from 'data/schedule2022';
 import {
   currencyFormatter,
-  getCurrentWeek,
   getTeamIcon,
   getUserAvatar,
   relativeTime,
@@ -31,7 +30,11 @@ import {
   MessageCircle,
 } from 'tabler-icons-react';
 import { ContentWithComments } from 'types/content';
-import { FraudListWinnings, FraudPicks } from 'types/football';
+import {
+  FraudListResults,
+  FraudListWinnings,
+  FraudPicks,
+} from 'types/football';
 import { Profile } from 'types/user';
 
 type ProfileWithContentAndFraudData = Profile & {
@@ -54,23 +57,26 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
-  const now = new Date();
-  const weekLocked = now >= getCurrentWeek(schedule).startDate;
+  const { data: fraudListResults } = await supabaseServerClient(ctx)
+    .from<FraudListResults>('fraudListResults')
+    .select('*');
 
   const viewingOwnProfile = user?.id === profile.id;
 
-  return { props: { profile, weekLocked, viewingOwnProfile } };
+  return {
+    props: { profile, fraudListResults, viewingOwnProfile },
+  };
 };
 
 type ProfileProps = {
   profile: ProfileWithContentAndFraudData;
-  weekLocked: boolean;
+  fraudListResults: FraudListResults[];
   viewingOwnProfile: boolean;
 };
 
 export default function UserProfile({
   profile,
-  weekLocked,
+  fraudListResults,
   viewingOwnProfile,
 }: ProfileProps) {
   const seasonsFraudListWinnings = profile.fraudListWinnings?.reduce(
@@ -80,7 +86,7 @@ export default function UserProfile({
     0,
   );
 
-  const sortedFraudPicks = profile.fraudPicks.sort((a, b) => b.week - a.week);
+  const sortedFraudPicks = profile.fraudPicks.sort((a, b) => a.week - b.week);
   const sortedContent = profile.content.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
@@ -178,28 +184,42 @@ export default function UserProfile({
                   }
                 >
                   <Group spacing={0} mb="xs">
-                    {pick.picks.map((team) => (
-                      <Avatar
-                        key={team}
-                        size={64}
-                        src={
-                          weekLocked || viewingOwnProfile
-                            ? getTeamIcon(team)
-                            : null
-                        }
-                        radius="xl"
-                        p={4}
-                        mr="xs"
-                        sx={(theme) => ({
-                          borderWidth: 2,
-                          borderColor: theme.colors.dark[4],
-                          borderStyle: 'solid',
-                          background: theme.colors.dark[7],
-                        })}
-                      >
-                        <BallAmericanFootball size={36} />
-                      </Avatar>
-                    ))}
+                    {pick.picks.map((team) => {
+                      const weekLosers = fraudListResults.find(
+                        (result) => result.week === pick.week,
+                      )?.losers;
+
+                      const now = new Date();
+                      const itemWeek = schedule.find(
+                        (x) => x.week === pick.week,
+                      );
+                      const weekLocked = itemWeek && itemWeek.startDate <= now;
+
+                      return (
+                        <Avatar
+                          key={team}
+                          size={64}
+                          src={
+                            weekLocked || viewingOwnProfile
+                              ? getTeamIcon(team)
+                              : null
+                          }
+                          radius="xl"
+                          p={4}
+                          mr="xs"
+                          sx={(theme) => ({
+                            borderWidth: 2,
+                            borderColor: weekLosers?.includes(team)
+                              ? theme.colors.teal[8]
+                              : theme.colors.dark[4],
+                            borderStyle: 'solid',
+                            background: theme.colors.dark[7],
+                          })}
+                        >
+                          <BallAmericanFootball size={36} />
+                        </Avatar>
+                      );
+                    })}
                   </Group>
                   <Text weight="bold" color="dimmed">
                     Earned{' '}
