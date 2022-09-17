@@ -3,11 +3,10 @@ import {
   getUser,
   supabaseClient,
   supabaseServerClient,
-  User,
   withPageAuth,
 } from '@supabase/auth-helpers-nextjs';
 import { PageHeader, PostForm } from 'components';
-import { FilePencil, FilePlus } from 'tabler-icons-react';
+import { FilePencil } from 'tabler-icons-react';
 import { Profile } from 'types/user';
 import { Tag, Content } from 'types/content';
 import { useState } from 'react';
