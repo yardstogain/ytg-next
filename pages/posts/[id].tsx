@@ -16,6 +16,7 @@ import {
 import { useInputState } from '@mantine/hooks';
 import { NextLink } from '@mantine/next';
 import {
+  getUser,
   supabaseClient,
   supabaseServerClient,
   User,
@@ -30,8 +31,10 @@ import {
   ArrowDown,
   ArrowLeft,
   Calendar,
+  Clock,
   FilePlus,
   MessageCircle,
+  Pencil,
   Speakerphone,
   Tags,
   User as UserIcon,
@@ -49,6 +52,7 @@ type EnhancedContent = Content & {
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { user } = await getUser(ctx);
   const { data: content } = await supabaseServerClient(ctx)
     .from<EnhancedContent>('content')
     .select(
@@ -77,7 +81,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     .select('*')
     .in('slug', [...content.tags]);
 
-  return { props: { content, taggedUsers, tags } };
+  return { props: { content, taggedUsers, tags, user } };
 };
 
 type ContentAuthorProps = {
@@ -163,6 +167,7 @@ export default function SinglePost({
   tags,
   user,
 }: SinglePostProps) {
+  console.log(user.id, content.author);
   const router = useRouter();
   const [commentContent, setCommentContent] = useInputState('');
   const [loading, setLoading] = useState(false);
@@ -204,9 +209,22 @@ export default function SinglePost({
       </Group>
       <Grid gutter="xl">
         <Grid.Col span={8}>
-          <ContentAuthor profile={content.profile} />
+          <Group spacing={0} position="apart">
+            <ContentAuthor profile={content.profile} />
+            {user.id === content.author && (
+              <Button
+                component={NextLink}
+                href={`/posts/edit/${content.id}`}
+                variant="subtle"
+                color="gray"
+                leftIcon={<Pencil size={16} />}
+              >
+                Edit
+              </Button>
+            )}
+          </Group>
           <MarkdownContent content={content.markdownContent} />
-          <Group spacing={0} mt="sm">
+          <Group spacing="md" mt="sm">
             <Group spacing={8}>
               <Text color="dimmed" sx={{ lineHeight: 1 }}>
                 <Calendar size={14} />
@@ -215,6 +233,16 @@ export default function SinglePost({
                 {relativeTime.from(new Date(content.createdAt))}
               </Text>
             </Group>
+            {content.updatedAt !== content.createdAt && (
+              <Group spacing={8}>
+                <Text color="dimmed" sx={{ lineHeight: 1 }}>
+                  <Clock size={14} />
+                </Text>
+                <Text size="sm" color="dimmed">
+                  Edited {relativeTime.from(new Date(content.updatedAt))}
+                </Text>
+              </Group>
+            )}
           </Group>
 
           <>
