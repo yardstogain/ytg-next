@@ -174,7 +174,7 @@ export default function LadderPage({
                     }
                   >
                     {currencyFormatter.format(
-                      user.totalWinnings / user.fraudPicks.length,
+                      user.totalWinnings / user.fraudListWinnings.length,
                     )}
                   </Text>
                 </td>
