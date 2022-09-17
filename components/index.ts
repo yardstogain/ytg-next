@@ -8,6 +8,7 @@ export * from './MarkdownContent';
 export * from './Navigation';
 export * from './PageHeader';
 export * from './PostCard';
+export * from './PostForm';
 export * from './RoleBadge';
 export * from './RouterTransition';
 export * from './ScoreStrip';
