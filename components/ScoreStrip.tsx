@@ -82,7 +82,7 @@ export function ScoreStrip({ data }: ScoreStripProps) {
               pb={0}
               pt={4}
               sx={(theme) => ({
-                width: 100,
+                width: 110,
                 borderColor: comp.situation?.isRedZone // red for redzone
                   ? theme.colors.red[8]
                   : gameInProgress(comp.status.type.name) // otherwise, show blue for active games

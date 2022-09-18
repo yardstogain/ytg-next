@@ -233,7 +233,7 @@ export default function SinglePost({
                 {relativeTime.from(new Date(content.createdAt))}
               </Text>
             </Group>
-            {content.updatedAt !== content.createdAt && (
+            {content.updatedAt && (
               <Group spacing={8}>
                 <Text color="dimmed" sx={{ lineHeight: 1 }}>
                   <Clock size={14} />
