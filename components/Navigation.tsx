@@ -11,7 +11,6 @@ import {
   Stack,
   Paper,
   Badge,
-  useMantineTheme,
   Indicator,
 } from '@mantine/core';
 import {
@@ -26,9 +25,7 @@ import {
   Trophy,
   LockAccess,
   Files,
-  ChevronRight,
   Bell,
-  Dots,
   DotsVertical,
 } from 'tabler-icons-react';
 import { LogoIcon } from './LogoIcon';
@@ -126,7 +123,6 @@ const useStyles = createStyles((theme, _params, getRef) => {
 
 export function Navigation() {
   const router = useRouter();
-  const theme = useMantineTheme();
 
   const { classes } = useStyles();
   const [profile, setProfile] = useState<Profile>();
