@@ -28,6 +28,8 @@ import {
   Files,
   ChevronRight,
   Bell,
+  Dots,
+  DotsVertical,
 } from 'tabler-icons-react';
 import { LogoIcon } from './LogoIcon';
 import { NextLink } from '@mantine/next';
@@ -247,7 +249,7 @@ export function Navigation() {
                           {profile.teamName}
                         </Text>
                       </Stack>
-                      <ChevronRight />
+                      <DotsVertical size={16} />
                     </Group>
                   </Paper>
                 </Indicator>
@@ -291,7 +293,8 @@ export function Navigation() {
                   <Menu.Item
                     component={NextLink}
                     href="/admin/dashboard"
-                    icon={<LockAccess size={16} color={theme.colors.red[9]} />}
+                    color="orange"
+                    icon={<LockAccess size={16} />}
                   >
                     Admin Dashboard
                   </Menu.Item>
