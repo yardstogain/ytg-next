@@ -68,7 +68,7 @@ export default function NewPost({ user, users, tags }: NewPostProps) {
             recipient: player,
             sender: user.id,
             type: 'call-out',
-            contentId: data?.id,
+            contentId: data.id,
             description: "You've been called out!",
           })),
         );
