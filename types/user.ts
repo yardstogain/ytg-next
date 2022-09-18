@@ -9,3 +9,14 @@ export type Profile = {
   slug: string;
   deleted: boolean;
 };
+
+export type Notification = {
+  id: number;
+  createdAt: string;
+  readAt?: string;
+  recipient: Profile['id'];
+  sender: Profile['id'];
+  type: 'call-out' | 'reminder';
+  description: string;
+  contentId?: string;
+};

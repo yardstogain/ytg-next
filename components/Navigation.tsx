@@ -5,8 +5,14 @@ import {
   Group,
   NavLink,
   Text,
-  Skeleton,
   Anchor,
+  Menu,
+  Avatar,
+  Stack,
+  Paper,
+  Badge,
+  useMantineTheme,
+  Indicator,
 } from '@mantine/core';
 import {
   Settings,
@@ -20,6 +26,8 @@ import {
   Trophy,
   LockAccess,
   Files,
+  ChevronRight,
+  Bell,
 } from 'tabler-icons-react';
 import { LogoIcon } from './LogoIcon';
 import { NextLink } from '@mantine/next';
@@ -27,8 +35,8 @@ import Link from 'next/link';
 import { supabaseClient } from '@supabase/auth-helpers-nextjs';
 import { useUser } from '@supabase/auth-helpers-react';
 import { useRouter } from 'next/router';
-import { Profile } from 'types/user';
-import { isAdmin } from 'lib/utils';
+import { Profile, Notification } from 'types/user';
+import { getUserAvatar, isAdmin } from 'lib/utils';
 
 const useStyles = createStyles((theme, _params, getRef) => {
   const icon = getRef('icon');
@@ -116,22 +124,34 @@ const useStyles = createStyles((theme, _params, getRef) => {
 
 export function Navigation() {
   const router = useRouter();
+  const theme = useMantineTheme();
+
   const { classes } = useStyles();
   const [profile, setProfile] = useState<Profile>();
+  const [notifications, setNotifications] = useState<number>(0);
   const { user } = useUser();
 
   useEffect(() => {
     async function loadData() {
       if (!user) return;
 
-      const { data } = await supabaseClient
+      const { data: profile } = await supabaseClient
         .from<Profile>('profile')
         .select('*')
         .match({ id: user.id })
         .single();
 
-      if (data) {
-        setProfile(data);
+      const { count } = await supabaseClient
+        .from<Notification>('notifications')
+        .select('id', { count: 'exact' })
+        .eq('recipient', user.id)
+        .is('readAt', null);
+
+      if (profile) {
+        setProfile(profile);
+      }
+      if (count) {
+        setNotifications(count);
       }
     }
     // Only run query once user is logged in.
@@ -191,44 +211,100 @@ export function Navigation() {
           </Link>
         </Group>
         <Group spacing={0} mb="md">
-          {user ? (
-            <>
-              {profile ? (
-                <Text
-                  size="xs"
-                  weight={700}
-                  transform="uppercase"
-                  color="dimmed"
+          {profile ? (
+            <Menu
+              width={280}
+              position="right-start"
+              transition="pop-top-left"
+              shadow="xl"
+            >
+              <Menu.Target>
+                <Indicator
+                  color="red"
+                  inline
+                  sx={{ width: '100%' }}
+                  disabled={notifications === 0}
                 >
-                  {profile.nickname}
-                </Text>
-              ) : (
-                <Skeleton radius="xl" height={18} width={64} />
-              )}
-              <NavLink
-                className={classes.link}
-                component={NextLink}
-                href={`/player/${profile?.slug}`}
-                icon={<User className={classes.linkIcon} />}
-                label="My Profile"
-              />
-              {/* <NavLink
-                className={classes.link}
-                component={NextLink}
-                href="/invite"
-                icon={<Share className={classes.linkIcon} />}
-                label="Invite a Friend"
-                active={router.pathname.includes('/invite')}
-              /> */}
-              <NavLink
-                className={classes.link}
-                component={NextLink}
-                href="/settings"
-                icon={<Settings className={classes.linkIcon} />}
-                label="Settings"
-                active={router.pathname === '/settings'}
-              />
-            </>
+                  <Paper
+                    withBorder
+                    p="sm"
+                    sx={(theme) => ({
+                      cursor: 'pointer',
+                      ':hover': {
+                        borderColor: theme.colors.blue[9],
+                      },
+                    })}
+                  >
+                    <Group spacing="sm">
+                      <Avatar
+                        src={getUserAvatar(profile.id)}
+                        radius="xl"
+                        size="md"
+                      />
+                      <Stack spacing={0} mr="auto">
+                        <Text weight="bold">{profile.nickname}</Text>
+                        <Text color="dimmed" size="sm">
+                          {profile.teamName}
+                        </Text>
+                      </Stack>
+                      <ChevronRight />
+                    </Group>
+                  </Paper>
+                </Indicator>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Label
+                  sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}
+                >
+                  Profile
+                </Menu.Label>
+                <Menu.Item
+                  component={NextLink}
+                  href={`/notifications`}
+                  icon={<Bell size={16} />}
+                  rightSection={
+                    notifications > 0 && (
+                      <Badge color="red" variant="filled">
+                        {notifications}
+                      </Badge>
+                    )
+                  }
+                >
+                  Notifications
+                </Menu.Item>
+                <Menu.Item
+                  component={NextLink}
+                  href={`/player/${profile.slug}`}
+                  icon={<User size={16} />}
+                >
+                  My Profile
+                </Menu.Item>
+                <Menu.Item
+                  component={NextLink}
+                  href="/settings"
+                  icon={<Settings size={16} />}
+                >
+                  Settings
+                </Menu.Item>
+                <Menu.Divider />
+                {isAdmin(profile.role) && (
+                  <Menu.Item
+                    component={NextLink}
+                    href="/admin/dashboard"
+                    icon={<LockAccess size={16} color={theme.colors.red[9]} />}
+                  >
+                    Admin Dashboard
+                  </Menu.Item>
+                )}
+                <Menu.Item
+                  component={NextLink}
+                  href="/api/auth/logout"
+                  icon={<Logout size={16} />}
+                >
+                  Logout
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
           ) : (
             <>
               <NavLink
@@ -304,27 +380,6 @@ export function Navigation() {
           active={router.pathname === '/posts/new'}
         />
       </Navbar.Section>
-      {user && (
-        <Navbar.Section className={classes.footer}>
-          {profile && isAdmin(profile.role) && (
-            <NavLink
-              className={classes.link}
-              component={NextLink}
-              href="/admin/dashboard"
-              icon={<LockAccess className={classes.linkIcon} />}
-              label="Admin"
-              active={router.pathname.includes('/admin')}
-            />
-          )}
-          <NavLink
-            component="a"
-            href="/api/auth/logout"
-            className={classes.link}
-            icon={<Logout className={classes.linkIcon} />}
-            label="Logout"
-          />
-        </Navbar.Section>
-      )}
     </Navbar>
   );
 }

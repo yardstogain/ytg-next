@@ -53,6 +53,7 @@ export default function NewPost({ user, users, tags }: NewPostProps) {
     const isValid = validate();
 
     if (isValid) {
+      // Create post
       const { data } = await supabaseClient
         .from<Content>('content')
         .insert([
@@ -61,6 +62,17 @@ export default function NewPost({ user, users, tags }: NewPostProps) {
         .single();
 
       if (data) {
+        // Send tagged players a notification
+        await supabaseClient.from('notifications').insert(
+          playerTags.map((player) => ({
+            recipient: player,
+            sender: user.id,
+            type: 'call-out',
+            contentId: data?.id,
+            description: "You've been called out!",
+          })),
+        );
+        // Go to new page
         router.replace(`/posts/${data.id}`);
       }
     }
