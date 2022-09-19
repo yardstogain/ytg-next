@@ -43,6 +43,7 @@ function renderNotification(notification: NotificationWithSender) {
     case 'call-out':
       return (
         <Paper
+          key={notification.id}
           component={NextLink}
           href={`/posts/${notification.contentId}`}
           p="md"
@@ -81,6 +82,7 @@ function renderNotification(notification: NotificationWithSender) {
     case 'reminder':
       return (
         <Paper
+          key={notification.id}
           component={NextLink}
           href={`/fraud-list/picks`}
           p="md"

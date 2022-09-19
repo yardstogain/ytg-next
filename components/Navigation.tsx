@@ -289,7 +289,7 @@ export function Navigation() {
                   <Menu.Item
                     component={NextLink}
                     href="/admin/dashboard"
-                    color="orange"
+                    color="blue"
                     icon={<LockAccess size={16} />}
                   >
                     Admin Dashboard
