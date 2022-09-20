@@ -69,7 +69,7 @@ export function getFraudValue({
       pointDiff * 1.1 +
       marginOfVictory * 0.35 +
       strengthOfSchedule * 0.75) /
-    1 // was 10 on week 1
+    2 // was 10 on week 1
   );
 }
 
